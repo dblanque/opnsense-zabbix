@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-11T21:46:51Z'
+  date: '2023-11-11T22:02:25Z'
   groups:
     - uuid: 4918b88734c54bd094cff7585b5d71fc
       name: 'Templates/Network Devices'
@@ -12,7 +12,7 @@ zabbix_export:
         Active template for opnsense, requires opnsense_zbx.php installed to OPNSense Box.
         Version 1.0.1
         
-        https://github.com/dblanque/opnsense-zabbix-template
+        https://github.com/dblanque/opnsense-zabbix
       groups:
         - name: 'Templates/Network Devices'
       items:
