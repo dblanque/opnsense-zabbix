@@ -594,7 +594,7 @@ function pfz_ipsec_discovery_ph1(){
 	
 	require_once("plugins.d/ipsec.inc");	
 	global $config;
-	init_config_arr(array('ipsec', 'phase1'));
+	$config = parse_config();
 	$a_phase1 = &$config['ipsec']['phase1'];
 	
 	$json_string = '{"data":[';
@@ -618,7 +618,7 @@ function pfz_ipsec_ph1($ikeid,$valuekey){
 
 	require_once("ipsec.inc");
 	global $config;
-	init_config_arr(array('ipsec', 'phase1'));
+	$config = parse_config();
 	$a_phase1 = &$config['ipsec']['phase1'];	
 
 	$value = "";	
@@ -649,7 +649,7 @@ function pfz_ipsec_discovery_ph2(){
 	require_once("ipsec.inc");
 	
 	global $config;
-	init_config_arr(array('ipsec', 'phase2'));
+	$config = parse_config();
 	$a_phase2 = &$config['ipsec']['phase2'];
 	
 	$json_string = '{"data":[';
@@ -673,7 +673,7 @@ function pfz_ipsec_discovery_ph2(){
 function pfz_ipsec_ph2($uniqid, $valuekey){
 	require_once("ipsec.inc");
 	global $config;
-	init_config_arr(array('ipsec', 'phase2'));
+	$config = parse_config();
 	$a_phase2 = &$config['ipsec']['phase2'];	
 	
 	$valuecfr = explode(".",$valuekey);
@@ -707,7 +707,7 @@ function pfz_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
 		
 	require_once("ipsec.inc");
 	global $config;
-	init_config_arr(array('ipsec', 'phase1'));
+	$config = parse_config();
 	
 	$a_phase1 = &$config['ipsec']['phase1'];
 	$conmap = array();
