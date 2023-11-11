@@ -1,0 +1,1467 @@
+zabbix_export:
+  version: '6.0'
+  date: '2023-11-11T21:46:51Z'
+  groups:
+    - uuid: 4918b88734c54bd094cff7585b5d71fc
+      name: 'Templates/Network Devices'
+  templates:
+    - uuid: 1db65b79c1b84431bc5da3591a99958f
+      template: 'Template OPNSense Active'
+      name: 'OPNSense Active'
+      description: |
+        Active template for opnsense, requires opnsense_zbx.php installed to OPNSense Box.
+        Version 1.0.1
+        
+        https://github.com/dblanque/opnsense-zabbix-template
+      groups:
+        - name: 'Templates/Network Devices'
+      items:
+        - uuid: 158624e9776d497889d2ecc5c6902c73
+          name: 'Maximum number of opened files'
+          type: ZABBIX_ACTIVE
+          key: kernel.maxfiles
+          delay: '3600'
+          history: 27d
+          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          tags:
+            - tag: Application
+              value: OS
+          triggers:
+            - uuid: badd760eae8043d4934daac83cdb6c4d
+              expression: 'last(/Template OPNSense Active/kernel.maxfiles)<1024'
+              name: 'Configured max number of opened files is too low on {HOST.NAME}'
+              priority: INFO
+        - uuid: 2a5057c23fd64320898a925c2a9da38e
+          name: 'Maximum number of processes'
+          type: ZABBIX_ACTIVE
+          key: kernel.maxproc
+          delay: '3600'
+          history: 27d
+          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          tags:
+            - tag: Application
+              value: OS
+          triggers:
+            - uuid: 0f7168ea8eaa4c44b127269b7da055c6
+              expression: 'last(/Template OPNSense Active/kernel.maxproc)<256'
+              name: 'Configured max number of processes is too low on {HOST.NAME}'
+              priority: INFO
+        - uuid: 6ee740cf9b7b42ce920006c60ba0cc00
+          name: 'Used memory (calc)'
+          type: CALCULATED
+          key: kt.mem.used
+          delay: '60'
+          history: 28d
+          units: B
+          params: 'last(//vm.memory.size[total]) - last(//vm.memory.size[available])'
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: e908c73b1d5946f2b88952b63e2a7e07
+          name: 'Expected CARP Status'
+          type: CALCULATED
+          key: opnsense.expected_carp_status
+          delay: 30s
+          params: '{$EXPECTED_CARP_STATUS}'
+          description: 'Expected CARP Status'
+          valuemap:
+            name: 'pfSense CARP Status'
+          tags:
+            - tag: Application
+              value: CARP
+        - uuid: 1c43722f068b4c18a4040fc9c6582a39
+          name: 'MBUF Cache'
+          type: ZABBIX_ACTIVE
+          key: opnsense.mbuf.cache
+          delay: '60'
+          history: 27d
+          tags:
+            - tag: Application
+              value: 'Network Limits'
+        - uuid: c8c18b01b3a542b09540143ef5ee23a5
+          name: 'MBUF Current'
+          type: ZABBIX_ACTIVE
+          key: opnsense.mbuf.current
+          delay: '60'
+          history: 27d
+          tags:
+            - tag: Application
+              value: 'Network Limits'
+        - uuid: 8a5b31b786bc4a329d232bdced6c6f0c
+          name: 'MBUF Max'
+          type: ZABBIX_ACTIVE
+          key: opnsense.mbuf.max
+          delay: '600'
+          history: 27d
+          tags:
+            - tag: Application
+              value: 'Network Limits'
+        - uuid: 2a0ab7aa12364a74ac0dfaaf27d7fc24
+          name: 'MBUF Total Used (percent)'
+          type: CALCULATED
+          key: opnsense.mbuf.ptotal
+          delay: '60'
+          history: 28d
+          value_type: FLOAT
+          units: '%'
+          params: '((last(//opnsense.mbuf.current) + last(//opnsense.mbuf.cache)) * 100) / last(//opnsense.mbuf.max)'
+          tags:
+            - tag: Application
+              value: 'Network Limits'
+          triggers:
+            - uuid: ebe2c02b7180418eb78b80113b602a1e
+              expression: 'last(/Template OPNSense Active/opnsense.mbuf.ptotal)>80'
+              name: 'MBUF used at 80%'
+              priority: WARNING
+            - uuid: 4ad74e25b94849dabf4afafe7f3ad083
+              expression: 'last(/Template OPNSense Active/opnsense.mbuf.ptotal)>90'
+              name: 'MBUF used at 90%'
+              priority: HIGH
+        - uuid: 5b0a9da1a5414c66829ebf2e9032c33e
+          name: 'States Table Current'
+          type: ZABBIX_ACTIVE
+          key: opnsense.states.current
+          delay: '60'
+          history: 27d
+          tags:
+            - tag: Application
+              value: 'Network Limits'
+        - uuid: 01f0a70a4493487bb5ba4425a32d633c
+          name: 'States Table Max'
+          type: ZABBIX_ACTIVE
+          key: opnsense.states.max
+          delay: '600'
+          history: 27d
+          tags:
+            - tag: Application
+              value: 'Network Limits'
+        - uuid: ef595b6fae084d8c853c11cad64fbdc4
+          name: 'States Table Current (percent)'
+          type: CALCULATED
+          key: opnsense.states.pused
+          delay: '60'
+          history: 28d
+          value_type: FLOAT
+          units: '%'
+          params: '(last(//opnsense.states.current) * 100) / last(//opnsense.states.max)'
+          tags:
+            - tag: Application
+              value: 'Network Limits'
+          triggers:
+            - uuid: 991175a052a049bbb25b049c67246fd5
+              expression: 'last(/Template OPNSense Active/opnsense.states.pused)>80'
+              name: 'State Table used at 80%'
+              priority: WARNING
+            - uuid: fe08509da34840a999bb5dd396d36269
+              expression: 'last(/Template OPNSense Active/opnsense.states.pused)>90'
+              name: 'State Table used at 90%'
+              priority: HIGH
+        - uuid: d1abfd00dc62410eb096d67475eb952d
+          name: 'CARP Status'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.value[carp_status]'
+          delay: 30s
+          description: 'pfSense CARP Status'
+          valuemap:
+            name: 'pfSense CARP Status'
+          tags:
+            - tag: Application
+              value: CARP
+          triggers:
+            - uuid: 51db964b1cb4452992359037debf1bbb
+              expression: 'last(/Template OPNSense Active/opnsense.value[carp_status])>2'
+              name: 'CARP  Problems on {HOST.NAME}'
+              priority: HIGH
+              description: 'CARP Problems'
+        - uuid: 08c62188426d4839aea0fdc261fa07c7
+          name: 'Gateway Status Raw'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.value[gw_status]'
+          delay: 60s
+          trends: '0'
+          value_type: TEXT
+          description: 'Gateway Status Raw'
+          tags:
+            - tag: Application
+              value: Gateways
+          triggers:
+            - uuid: 2d639cea87cf46c2818a657f5c30a4c7
+              expression: '(last(/Template OPNSense Active/opnsense.value[gw_status],#1)<>last(/Template OPNSense Active/opnsense.value[gw_status],#2))>0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '(last(/Template OPNSense Active/opnsense.value[gw_status],#1)<>last(/Template OPNSense Active/opnsense.value[gw_status],#2))=0'
+              name: 'pfSense Gateway Status Changed on {HOST.NAME}'
+              priority: AVERAGE
+              description: 'Gateway Status Change, for use with an acion Script (e.g. update DNS record)'
+              manual_close: 'YES'
+        - uuid: f1ff72bb97d54ba2a51768482b9461db
+          name: 'OPNSense Installed Version'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.value[system,installed_version]'
+          delay: 30m
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: Application
+              value: System
+        - uuid: 9ab8caeb3f194859a91af5b218b9ca5e
+          name: 'New Version of OPNSense Available'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.value[system,new_version_available]'
+          delay: 30m
+          history: 45d
+          valuemap:
+            name: 'Generic YesNo'
+          tags:
+            - tag: Application
+              value: System
+          triggers:
+            - uuid: a47de48b640d4c8990f7affbebb11da8
+              expression: 'last(/Template OPNSense Active/opnsense.value[system,new_version_available])=1'
+              name: 'New Version of pfSense Available on {HOST.NAME}'
+              priority: INFO
+              description: 'A new version of pfSense is available for update.'
+              manual_close: 'YES'
+        - uuid: 86623f615bba4d17b565f90ac61ab901
+          name: 'OPNSense Available Version'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.value[system,version]'
+          delay: 30m
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: Application
+              value: System
+        - uuid: b5e7a8603435496cbc73c3c68ff6140c
+          name: 'Number of running processes'
+          type: ZABBIX_ACTIVE
+          key: 'proc.num[,,run]'
+          delay: '60'
+          history: 27d
+          description: 'Number of processes in running state.'
+          tags:
+            - tag: Application
+              value: Processes
+          triggers:
+            - uuid: 131ac3b7caa14776801619de17bb95a2
+              expression: 'avg(/Template OPNSense Active/proc.num[,,run],5m)>30'
+              name: 'Too many processes running on {HOST.NAME}'
+              priority: WARNING
+        - uuid: aa4c2b8d986b489ab2f2cd652ed91a46
+          name: 'Number of processes'
+          type: ZABBIX_ACTIVE
+          key: 'proc.num[]'
+          delay: '60'
+          history: 27d
+          description: 'Total number of processes in any state.'
+          tags:
+            - tag: Application
+              value: Processes
+          triggers:
+            - uuid: 3ff818973f0e40169f33522a0de12ebd
+              expression: 'avg(/Template OPNSense Active/proc.num[],5m)>300'
+              name: 'Too many processes on {HOST.NAME}'
+              priority: WARNING
+        - uuid: 03847f32f2714543b374dc84370309b7
+          name: 'Host boot time'
+          type: ZABBIX_ACTIVE
+          key: system.boottime
+          delay: '600'
+          history: 27d
+          units: unixtime
+          tags:
+            - tag: Application
+              value: OS
+        - uuid: a09f3e91024942b4b3a9b6af7bbf9df5
+          name: 'Interrupts per second'
+          type: ZABBIX_ACTIVE
+          key: system.cpu.intr
+          delay: '60'
+          history: 27d
+          units: ips
+          preprocessing:
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: cbe747c59a4a4a86aaf14f0dca016d10
+          name: 'Processor load (1min/core)'
+          type: ZABBIX_ACTIVE
+          key: 'system.cpu.load[percpu,avg1]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            - tag: Application
+              value: CPU
+          triggers:
+            - uuid: 0fd25a1e99be42ca9d2e75e28b8f4547
+              expression: 'avg(/Template OPNSense Active/system.cpu.load[percpu,avg1],5m)>5'
+              name: 'Processor load is too high on {HOST.NAME}'
+              priority: WARNING
+        - uuid: bcb9774ac4f84c03b12f7c63efeb9745
+          name: 'Processor load (5min/core)'
+          type: ZABBIX_ACTIVE
+          key: 'system.cpu.load[percpu,avg5]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: 36df9e82dc1c461589b45d7fa959aef7
+          name: 'Processor load (15min/core)'
+          type: ZABBIX_ACTIVE
+          key: 'system.cpu.load[percpu,avg15]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: a663ca2ca7a8467ca4ee0e73a61e7f5a
+          name: 'Context switches per second'
+          type: ZABBIX_ACTIVE
+          key: system.cpu.switches
+          delay: '60'
+          history: 27d
+          units: sps
+          preprocessing:
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: 582edf149c0e41d687c71f172c9a4576
+          name: 'CPU idle time'
+          type: ZABBIX_ACTIVE
+          key: 'system.cpu.util[,idle]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent doing nothing.'
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: 898d80e09a5f429c9b92f89a4c7add63
+          name: 'CPU interrupt time'
+          type: ZABBIX_ACTIVE
+          key: 'system.cpu.util[,interrupt]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          units: '%'
+          description: 'The amount of time the CPU has been servicing hardware interrupts.'
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: b55ff4a7987f4793a0ca41c307faea19
+          name: 'CPU $2 time'
+          type: ZABBIX_ACTIVE
+          key: 'system.cpu.util[,nice]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running users'' processes that have been niced.'
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: e1d10c63db014a74965946a7fea70675
+          name: 'CPU system time'
+          type: ZABBIX_ACTIVE
+          key: 'system.cpu.util[,system]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running the kernel and its processes.'
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: 0a49ca89d46b40199616ccb1b250e003
+          name: 'CPU $2 time'
+          type: ZABBIX_ACTIVE
+          key: 'system.cpu.util[,user]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running users'' processes that are not niced.'
+          tags:
+            - tag: Application
+              value: CPU
+        - uuid: 350165011c144a34be8d142ca60f7f44
+          name: 'Host name'
+          type: ZABBIX_ACTIVE
+          key: system.hostname
+          delay: '3600'
+          history: 27d
+          trends: '0'
+          value_type: CHAR
+          description: 'System host name.'
+          inventory_link: NAME
+          tags:
+            - tag: Application
+              value: OS
+          triggers:
+            - uuid: 1f6474aecd4642dd802dd7187aedcb45
+              expression: '(last(/Template OPNSense Active/system.hostname,#1)<>last(/Template OPNSense Active/system.hostname,#2))>0'
+              name: 'Hostname was changed on {HOST.NAME}'
+              priority: INFO
+        - uuid: ee34543337124d50b99c8957f65cde73
+          name: 'Host local time'
+          type: ZABBIX_ACTIVE
+          key: system.localtime
+          delay: '60'
+          history: 27d
+          units: unixtime
+          tags:
+            - tag: Application
+              value: OS
+        - uuid: 84288c1fb1d04468afc4239907305538
+          name: 'Free swap space'
+          type: ZABBIX_ACTIVE
+          key: 'system.swap.size[,free]'
+          delay: '60'
+          history: 27d
+          units: B
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: a603bbed1f184f82bfdcc9a5a2511378
+          name: 'Free swap space in %'
+          type: ZABBIX_ACTIVE
+          key: 'system.swap.size[,pfree]'
+          delay: '60'
+          history: 27d
+          value_type: FLOAT
+          units: '%'
+          tags:
+            - tag: Application
+              value: Memory
+          triggers:
+            - uuid: 33e4a1849ef3437d81add26953d672ca
+              expression: 'last(/Template OPNSense Active/system.swap.size[,pfree])<50'
+              name: 'Lack of free swap space on {HOST.NAME}'
+              priority: WARNING
+              description: 'It probably means that the systems requires more physical memory.'
+        - uuid: 816f8888b0af41d59554b81755108050
+          name: 'Total swap space'
+          type: ZABBIX_ACTIVE
+          key: 'system.swap.size[,total]'
+          delay: '3600'
+          history: 27d
+          units: B
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: a027171389b24248b0000f707137fa53
+          name: 'Used swap space'
+          type: ZABBIX_ACTIVE
+          key: 'system.swap.size[,used]'
+          delay: '60'
+          history: 27d
+          units: B
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: ed17b774ca674346b338037d272d64aa
+          name: 'System information'
+          type: ZABBIX_ACTIVE
+          key: system.uname
+          delay: '3600'
+          history: 27d
+          trends: '0'
+          value_type: CHAR
+          description: 'The information as normally returned by ''uname -a''.'
+          inventory_link: OS
+          tags:
+            - tag: Application
+              value: OS
+          triggers:
+            - uuid: 595c4d2f9c194af6baab01c28e066bda
+              expression: '(last(/Template OPNSense Active/system.uname,#1)<>last(/Template OPNSense Active/system.uname,#2))>0'
+              name: 'Host information was changed on {HOST.NAME}'
+              priority: INFO
+        - uuid: 85cf8a7f82b641a38f5891c2104dfae2
+          name: 'System uptime'
+          type: ZABBIX_ACTIVE
+          key: system.uptime
+          delay: '600'
+          history: 27d
+          units: uptime
+          tags:
+            - tag: Application
+              value: OS
+          triggers:
+            - uuid: 984463e2d518411ca02e536f1ec7a482
+              expression: 'change(/Template OPNSense Active/system.uptime)<0'
+              name: '{HOST.NAME} has just been restarted'
+              priority: INFO
+        - uuid: ccf1155d6d8a4be7af9d1e8ff3e4df4f
+          name: 'Number of logged in users'
+          type: ZABBIX_ACTIVE
+          key: system.users.num
+          delay: '60'
+          history: 27d
+          description: 'Number of users who are currently logged in.'
+          tags:
+            - tag: Application
+              value: OS
+        - uuid: df8b81e9cb2c45d2b63f19df829dd033
+          name: 'Checksum of /etc/passwd'
+          type: ZABBIX_ACTIVE
+          key: 'vfs.file.cksum[/etc/passwd]'
+          delay: '3600'
+          history: 27d
+          tags:
+            - tag: Application
+              value: OS
+          triggers:
+            - uuid: 850ae4783be044b5a99e856a90d072c7
+              expression: '(last(/Template OPNSense Active/vfs.file.cksum[/etc/passwd],#1)<>last(/Template OPNSense Active/vfs.file.cksum[/etc/passwd],#2))>0'
+              name: '/etc/passwd has been changed on {HOST.NAME}'
+              priority: WARNING
+        - uuid: 5f783701e46944658fa2b4f7336c9cdf
+          name: 'Active memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[active]'
+          delay: '60'
+          history: 28d
+          units: B
+          description: 'quantité de mémoire en cours d''utilisation par les processus'
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: 3fbda21ce408414db302108364c3f1f6
+          name: 'Available memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[available]'
+          delay: '60'
+          history: 27d
+          units: B
+          description: 'Available memory is defined as free+cached+buffers memory.'
+          tags:
+            - tag: Application
+              value: Memory
+          triggers:
+            - uuid: 1c99f0faec434f7fbc6d3565e07b4d9b
+              expression: 'last(/Template OPNSense Active/vm.memory.size[available])<20M'
+              name: 'Lack of available memory on server {HOST.NAME}'
+              priority: AVERAGE
+        - uuid: 7f763587293c4325b3499bb6e55b870d
+          name: 'Buffered memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[buffers]'
+          delay: '60'
+          history: 28d
+          status: DISABLED
+          units: B
+          description: |
+            Cache d'entrées des IO disque.
+            
+            (Item désactivé car buggé)
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: c8e072963c164c81a5b202feb85a475a
+          name: 'Cached memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[cached]'
+          delay: '60'
+          history: 28d
+          units: B
+          description: 'quantité de mémoire utilisée pour mettre des données en cache'
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: 93a487474ae44703a4f730ddda2a9079
+          name: 'Free memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[free]'
+          delay: '60'
+          history: 28d
+          units: B
+          description: 'quantité de mémoire complètement libre et prête a être utilisée directement.'
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: 4d66e3f263db44bdbdf170cf7450e9f2
+          name: 'Inactive memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[inactive]'
+          delay: '60'
+          history: 28d
+          units: B
+          description: 'quantité de mémoire qui contient des données qui ne sont plus utilisées (peut être directement libéré si besoin)'
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: 57fdef76e8604e7fa0d927dfadfa57b9
+          name: 'Available memory (percent)'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[pavailable]'
+          delay: '60'
+          history: 28d
+          value_type: FLOAT
+          units: '%'
+          description: 'Available memory is defined as free+cached+buffers memory.'
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1'
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: 40e600d451b14f5b8bc0d88fa91138d4
+          name: 'Shared memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[shared]'
+          delay: '60'
+          history: 28d
+          status: DISABLED
+          units: B
+          description: |
+            quantité de mémoire partagée entre plusieurs processus
+            
+            (Item désactivé car non utilisé)
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: 0aa5cdcec2b34d11926303999ab94274
+          name: 'Total memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[total]'
+          delay: '3600'
+          history: 27d
+          units: B
+          description: 'quantité de mémoire totale'
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: cc2269f8ddcf455fb839b4f00bbaab1b
+          name: 'Used memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[used]'
+          delay: '60'
+          history: 28d
+          status: DISABLED
+          units: B
+          description: 'Item désactivé car non utilisé'
+          tags:
+            - tag: Application
+              value: Memory
+        - uuid: 7e019179db3b44ba995462a06f467bd5
+          name: 'Wired memory'
+          type: ZABBIX_ACTIVE
+          key: 'vm.memory.size[wired]'
+          delay: '60'
+          history: 28d
+          units: B
+          description: 'quantité de mémoire utilisée par le kernel, ne peut être ni déchargée en swap, ni compressée.'
+          tags:
+            - tag: Application
+              value: Memory
+      discovery_rules:
+        - uuid: 7749dddc96214f7e9aae25b76ab077b2
+          name: 'Gateways Discovery'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.discovery[gw]'
+          delay: 30s
+          description: 'Gateway Discovery'
+          item_prototypes:
+            - uuid: e6513e8ff4454f82b9994fb4c72e6ab0
+              name: 'Gateway {#GATEWAY} RTT'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[gw_value,{#GATEWAY},delay]'
+              delay: 30s
+              value_type: FLOAT
+              units: ms
+              preprocessing:
+                - type: RTRIM
+                  parameters:
+                    - ms
+              tags:
+                - tag: Application
+                  value: Gateways
+            - uuid: 657f655fb9204eaf86af048ece7c23dc
+              name: 'Gateway {#GATEWAY} Packet  Loss'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[gw_value,{#GATEWAY},loss]'
+              delay: 30s
+              units: '%'
+              preprocessing:
+                - type: RTRIM
+                  parameters:
+                    - '%'
+              tags:
+                - tag: Application
+                  value: Gateways
+            - uuid: 70e6d48e6ecb4baea575b17ebfc1b54d
+              name: 'Gateway {#GATEWAY} Status'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[gw_value,{#GATEWAY},status]'
+              delay: 30s
+              description: 'Status of Gateway'
+              valuemap:
+                name: 'pfSense Gateway Status'
+              tags:
+                - tag: Application
+                  value: Gateways
+              trigger_prototypes:
+                - uuid: b06641e12f64466ea49abebbb455afe3
+                  expression: 'last(/Template OPNSense Active/opnsense.value[gw_value,{#GATEWAY},status])=5'
+                  name: 'Gateway {#GATEWAY} is down'
+                  priority: DISASTER
+                  description: 'Gateway is Down'
+                - uuid: 9e81332b680f4ad3988c8f933aa104e8
+                  expression: 'last(/Template OPNSense Active/opnsense.value[gw_value,{#GATEWAY},status])=4'
+                  name: 'Gateway {#GATEWAY} is forced down'
+                  priority: INFO
+                  description: 'Gateway is forced down by system administrator'
+                - uuid: bbdb0c453c8345bca5e955af89bdb290
+                  expression: 'last(/Template OPNSense Active/opnsense.value[gw_value,{#GATEWAY},status])=2'
+                  name: 'High Delay on gateway {#GATEWAY}'
+                  priority: WARNING
+                  description: 'Gateway is lagging'
+                - uuid: 3ef25361c9b540689c44174c06443671
+                  expression: 'last(/Template OPNSense Active/opnsense.value[gw_value,{#GATEWAY},status])=3'
+                  name: 'High packet Loss on {#GATEWAY}'
+                  priority: HIGH
+                  description: 'High Packet Loss on Gateway'
+                - uuid: 492348f0bba44d1bb69d238c562bfc7e
+                  expression: 'last(/Template OPNSense Active/opnsense.value[gw_value,{#GATEWAY},status])=1'
+                  name: 'Packet Loss on {#GATEWAY}'
+                  priority: WARNING
+                  description: 'Packet loss on Gateway'
+            - uuid: 64bff872864847c48dc0eaa0ef3acb42
+              name: 'Gateway {#GATEWAY} RTT Std Deviation'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[gw_value,{#GATEWAY},stddev]'
+              delay: 30s
+              value_type: FLOAT
+              units: ms
+              preprocessing:
+                - type: RTRIM
+                  parameters:
+                    - ms
+              tags:
+                - tag: Application
+                  value: Gateways
+          graph_prototypes:
+            - uuid: 274656d8ca584691b69a3eb729efb067
+              name: 'Gateway {#GATEWAY} Availability'
+              graph_items:
+                - color: 199C0D
+                  calc_fnc: ALL
+                  item:
+                    host: 'Template OPNSense Active'
+                    key: 'opnsense.value[gw_value,{#GATEWAY},delay]'
+                - sortorder: '1'
+                  color: FF5722
+                  calc_fnc: ALL
+                  item:
+                    host: 'Template OPNSense Active'
+                    key: 'opnsense.value[gw_value,{#GATEWAY},loss]'
+            - uuid: 863dafc75c9e46bba035c8a422041e94
+              name: 'Gateway {#GATEWAY} Status'
+              yaxismax: '5'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                - color: 199C0D
+                  calc_fnc: ALL
+                  item:
+                    host: 'Template OPNSense Active'
+                    key: 'opnsense.value[gw_value,{#GATEWAY},status]'
+        - uuid: 34a00356fb204593a73b0d874e90bb77
+          name: 'Network interface discovery'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.discovery[interfaces]'
+          delay: 3600s
+          filter:
+            conditions:
+              - macro: '{#IFNAME}'
+                value: '@Network interfaces for discovery'
+                formulaid: A
+          lifetime: 7d
+          description: 'Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".'
+          item_prototypes:
+            - uuid: b579e827d8e24674a858ede5afb9a0a4
+              name: 'Incoming network traffic on {#IFDESCR}'
+              type: ZABBIX_ACTIVE
+              key: 'net.if.in[{#IFNAME}]'
+              delay: '60'
+              history: 7d
+              units: bps
+              preprocessing:
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                - type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: 0f4093ee5f9a4cdabc6490479948d778
+              name: 'Outgoing network traffic on {#IFDESCR}'
+              type: ZABBIX_ACTIVE
+              key: 'net.if.out[{#IFNAME}]'
+              delay: '60'
+              history: 7d
+              units: bps
+              preprocessing:
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                - type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+          graph_prototypes:
+            - uuid: 571e6bb85349476b89901bb981a06d73
+              name: 'Network traffic on {#IFDESCR}'
+              show_triggers: 'NO'
+              show_legend: 'NO'
+              ymin_type_1: FIXED
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: '29E900'
+                  item:
+                    host: 'Template OPNSense Active'
+                    key: 'net.if.in[{#IFNAME}]'
+                - sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: FD0000
+                  item:
+                    host: 'Template OPNSense Active'
+                    key: 'net.if.out[{#IFNAME}]'
+        - uuid: df7dee27bf1f490ab34c294a5c8d5722
+          name: 'OpenVPN Client Discovery'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.discovery[openvpn_client]'
+          delay: 30s
+          description: 'OpenVPN Client Discovery'
+          item_prototypes:
+            - uuid: 10cd020dad4f4c4dad9f6ab24db124b9
+              name: 'OpenVPN Client  {#NAME} Tunnel Status'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[openvpn_clientvalue,{#CLIENT},status]'
+              delay: 30s
+              valuemap:
+                name: 'pfSense OpenVPN Interface Status'
+              tags:
+                - tag: Application
+                  value: 'OpenVPN Client'
+              trigger_prototypes:
+                - uuid: 65c8f523a7e841869f8d4c9a1d3a8d24
+                  expression: 'last(/Template OPNSense Active/opnsense.value[openvpn_clientvalue,{#CLIENT},status])=0'
+                  name: 'OpenVPN Client {#NAME} Tunnel is Down'
+                  priority: HIGH
+                  description: 'OpenVPN Tunnel Down'
+        - uuid: f71c0b26359b4dc386aabdfd50a0d077
+          name: 'OpenVPN Server Discovery'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.discovery[openvpn_server]'
+          delay: 30s
+          item_prototypes:
+            - uuid: 0924585147b04316a835f4c33db1dd53
+              name: 'OpenVPN Server {#NAME} Clients Connected'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[openvpn_servervalue,{#SERVER},conns]'
+              delay: 60s
+              tags:
+                - tag: Application
+                  value: 'OpenVPN Server'
+            - uuid: 5e91ab55199245a5a7eb57be1b3ad1b2
+              name: 'OpenVPN Server {#NAME} Mode'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[openvpn_servervalue,{#SERVER},mode]'
+              delay: 300s
+              valuemap:
+                name: 'pfSense OpenVPN Mode'
+              tags:
+                - tag: Application
+                  value: 'OpenVPN Server'
+            - uuid: d9ef314e582a4436b578be06d5f63852
+              name: 'OpenVPN Server {#NAME} Port'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[openvpn_servervalue,{#SERVER},port]'
+              delay: 300s
+              tags:
+                - tag: Application
+                  value: 'OpenVPN Server'
+            - uuid: 3d97348f9bfd4d679879673575ab5e35
+              name: 'OpenVPN Server {#NAME} Remote Address'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[openvpn_servervalue,{#SERVER},real_address]'
+              delay: 60s
+              trends: '0'
+              value_type: TEXT
+              tags:
+                - tag: Application
+                  value: 'OpenVPN Server'
+            - uuid: 15671769d77644a081e57abb7c44ef43
+              name: 'OpenVPN Server {#NAME} Remote Host'
+              key: 'opnsense.value[openvpn_servervalue,{#SERVER},remote_host]'
+              trends: '0'
+              status: DISABLED
+              value_type: TEXT
+            - uuid: 89915eeb84034fceb51130da3e202ad3
+              name: 'OpenVPN Server {#NAME} Tunnel Status'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[openvpn_servervalue,{#SERVER},status]'
+              delay: 60s
+              valuemap:
+                name: 'pfSense OpenVPN Interface Status'
+              tags:
+                - tag: Application
+                  value: 'OpenVPN Server'
+          trigger_prototypes:
+            - uuid: a23f0a2a73a1469b90a097affc6c0232
+              expression: 'last(/Template OPNSense Active/opnsense.expected_carp_status)<>2 and last(/Template OPNSense Active/opnsense.value[openvpn_servervalue,{#SERVER},status])=0'
+              name: 'OpenVPN Server {#NAME} is Down'
+              priority: HIGH
+              description: 'OpenVPN Tunnel is Down'
+        - uuid: 5c3f831a51b247f98f08e54f9ab99b7f
+          name: 'Services Discovery'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.discovery[services]'
+          delay: 30s
+          item_prototypes:
+            - uuid: 261ba0f28e1842cb9dd0c39915d7db49
+              name: 'Service {#DESCRIPTION}  enabled on CARP Slave'
+              key: 'opnsense.value[service_value,{#SERVICE},run_on_carp_slave]'
+              delay: 600s
+              valuemap:
+                name: 'Generic YesNo'
+              tags:
+                - tag: Application
+                  value: Services
+            - uuid: 1aaa1bb4333d4a5084a612c7d66ae1d0
+              name: 'Service {#DESCRIPTION} Status'
+              key: 'opnsense.value[service_value,{#SERVICE},status]'
+              delay: 30s
+              valuemap:
+                name: 'Service state'
+              tags:
+                - tag: Application
+                  value: Services
+          trigger_prototypes:
+            - uuid: d65887f6edb54946820f328a203dda94
+              expression: |
+                last(/Template OPNSense Active/opnsense.value[service_value,{#SERVICE},status])=0 and (
+                
+                (last(/Template OPNSense Active/opnsense.value[service_value,{#SERVICE},run_on_carp_slave])=1 and 
+                last(/Template OPNSense Active/opnsense.value[carp_status])=2)
+                
+                or
+                
+                ( last(/Template OPNSense Active/opnsense.value[carp_status])=1)
+                
+                or
+                
+                (last(/Template OPNSense Active/opnsense.value[carp_status])=0)
+                )
+              name: 'Service {#DESCRIPTION} is not running'
+              priority: HIGH
+              description: 'Service is not running'
+        - uuid: c06a6d5f463343f094ce6dff4e279bc1
+          name: 'Mounted filesystem discovery'
+          type: ZABBIX_ACTIVE
+          key: vfs.fs.discovery
+          delay: '3600'
+          filter:
+            conditions:
+              - macro: '{#FSTYPE}'
+                value: '@File systems for discovery'
+                formulaid: A
+          lifetime: 7d
+          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          item_prototypes:
+            - uuid: 3877d92ba0eb4b04a379c2752fc2dedd
+              name: 'Free inodes on {#FSNAME} (percentage)'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              delay: '60'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              tags:
+                - tag: Application
+                  value: Filesystems
+              trigger_prototypes:
+                - uuid: c65b75c884bd4a1c9a98e0bf7b92411f
+                  expression: 'last(/Template OPNSense Active/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  name: 'Free inodes is less than 20% on volume {#FSNAME}'
+                  priority: WARNING
+            - uuid: fe88c70afea04a5bb4c1dc08aa8c18c4
+              name: 'Free disk space on {#FSNAME}'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.fs.size[{#FSNAME},free]'
+              delay: '60'
+              history: 7d
+              units: B
+              tags:
+                - tag: Application
+                  value: Filesystems
+            - uuid: 8b1ad00e9352486ba791d1ef2c5da3a8
+              name: 'Free disk space on {#FSNAME} (percentage)'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              delay: '60'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              tags:
+                - tag: Application
+                  value: Filesystems
+              trigger_prototypes:
+                - uuid: c12073f0ad354cebaeb810c8cb0c8fa7
+                  expression: 'last(/Template OPNSense Active/vfs.fs.size[{#FSNAME},pfree])<20'
+                  name: 'Free disk space is less than 20% on volume {#FSNAME}'
+                  priority: WARNING
+            - uuid: 639ad98a98b34f8e8d99c2da74ce0f12
+              name: 'Total disk space on {#FSNAME}'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.fs.size[{#FSNAME},total]'
+              delay: '3600'
+              history: 7d
+              units: B
+              tags:
+                - tag: Application
+                  value: Filesystems
+            - uuid: dd2d2a5a86a04d888c589b978a0db516
+              name: 'Used disk space on {#FSNAME}'
+              type: ZABBIX_ACTIVE
+              key: 'vfs.fs.size[{#FSNAME},used]'
+              delay: '60'
+              history: 7d
+              units: B
+              tags:
+                - tag: Application
+                  value: Filesystems
+          graph_prototypes:
+            - uuid: 0b89e1992a1a442dad2045291e9670b4
+              name: 'Disk space usage {#FSNAME}'
+              width: '600'
+              height: '340'
+              yaxismax: '0'
+              show_work_period: 'NO'
+              show_triggers: 'NO'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                - color: CC0000
+                  type: GRAPH_SUM
+                  item:
+                    host: 'Template OPNSense Active'
+                    key: 'vfs.fs.size[{#FSNAME},total]'
+                - sortorder: '1'
+                  color: 5B5B5B
+                  item:
+                    host: 'Template OPNSense Active'
+                    key: 'vfs.fs.size[{#FSNAME},free]'
+                - sortorder: '2'
+                  color: AEEE00
+                  item:
+                    host: 'Template OPNSense Active'
+                    key: 'vfs.fs.size[{#FSNAME},used]'
+      macros:
+        - macro: '{$EXPECTED_CARP_STATUS}'
+          value: '0'
+      dashboards:
+        - uuid: db655e6e8dc54a88abd3cb103d907c5f
+          name: 'System performance'
+          pages:
+            - widgets:
+                - type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '7'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Template OPNSense Active'
+                        name: 'Active Connections (pie)'
+                    - type: INTEGER
+                      name: source_type
+                      value: '0'
+                - type: GRAPH_CLASSIC
+                  'y': '7'
+                  width: '12'
+                  height: '7'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Template OPNSense Active'
+                        name: 'CPU load'
+                    - type: INTEGER
+                      name: source_type
+                      value: '0'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '7'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Template OPNSense Active'
+                        name: 'Network Memory Buffer (pie)'
+                    - type: INTEGER
+                      name: source_type
+                      value: '0'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '7'
+                  width: '12'
+                  height: '7'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Template OPNSense Active'
+                        name: 'Memory Usage simple (pie)'
+                    - type: INTEGER
+                      name: source_type
+                      value: '0'
+      valuemaps:
+        - uuid: 79e31e077f7d4c06879cd78e8e07cde5
+          name: 'Generic YesNo'
+          mappings:
+            - value: '0'
+              newvalue: 'No'
+            - value: '1'
+              newvalue: 'Yes'
+        - uuid: f4f11519a60a4ea1be767c8331f73179
+          name: 'pfSense CARP Status'
+          mappings:
+            - value: '0'
+              newvalue: Disabled
+            - value: '1'
+              newvalue: Master
+            - value: '2'
+              newvalue: Backup
+            - value: '3'
+              newvalue: Inconsistent
+            - value: '4'
+              newvalue: Problem
+        - uuid: 1d57ec29335143f6b423dcb60eeb6380
+          name: 'pfSense Gateway Status'
+          mappings:
+            - value: '0'
+              newvalue: Up
+            - value: '1'
+              newvalue: 'Packet Loss'
+            - value: '2'
+              newvalue: 'High Delay'
+            - value: '3'
+              newvalue: 'High Packet Loss'
+            - value: '4'
+              newvalue: 'Forced Down'
+            - value: '5'
+              newvalue: Down
+        - uuid: 45699329ad304a43ab6ca081b2c81e94
+          name: 'pfSense OpenVPN Interface Status'
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up
+            - value: '2'
+              newvalue: None
+            - value: '3'
+              newvalue: Reconnecting
+            - value: '4'
+              newvalue: Waiting
+            - value: '5'
+              newvalue: Up/Listening
+        - uuid: 3171b07087be4c93925e4abe3b888513
+          name: 'pfSense OpenVPN Mode'
+          mappings:
+            - value: '1'
+              newvalue: 'Peer to Peer (SSL/TLS)'
+            - value: '2'
+              newvalue: 'P2P Shared Key'
+            - value: '3'
+              newvalue: 'Remote Access (SSL/TLS)'
+            - value: '4'
+              newvalue: 'Remote Access (User Auth)'
+            - value: '5'
+              newvalue: 'Remote Access 8SSL/TLS + User Auth)'
+        - uuid: 5d7c2901f4e340c0ab4b5d9735b14f22
+          name: 'Service state'
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up
+  triggers:
+    - uuid: eabed5b72612419a8bb5f493d6dea59f
+      expression: 'last(/Template OPNSense Active/opnsense.expected_carp_status)<>0 and last(/Template OPNSense Active/opnsense.value[carp_status])<>{$EXPECTED_CARP_STATUS}'
+      name: 'CARP Status not Expected on {HOST.NAME}'
+      priority: HIGH
+      description: 'pfSense CARP is not in the state Expected. This means that a failover could be in process.'
+    - uuid: 19dcfb45c0c14f8a81dfadc91ab10e06
+      expression: '(last(/Template OPNSense Active/opnsense.value[system,version])<>last(/Template OPNSense Active/opnsense.value[system,installed_version]))=1'
+      name: 'New Version Available on {HOST.NAME}'
+      priority: INFO
+      description: 'Noify of new version of pfsense available'
+  graphs:
+    - uuid: 5fab072568c84a239ee959f837acab64
+      name: 'Active Connections'
+      show_triggers: 'NO'
+      ymin_type_1: FIXED
+      ymax_type_1: ITEM
+      ymax_item_1:
+        host: 'Template OPNSense Active'
+        key: opnsense.states.max
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: FF2C27
+          item:
+            host: 'Template OPNSense Active'
+            key: opnsense.states.current
+    - uuid: 58480727b1794329959cfdc379f57d03
+      name: 'Active Connections (pie)'
+      width: '600'
+      height: '340'
+      yaxismax: '0'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      graph_items:
+        - color: 5B5B5B
+          type: GRAPH_SUM
+          item:
+            host: 'Template OPNSense Active'
+            key: opnsense.states.max
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: FF2C27
+          item:
+            host: 'Template OPNSense Active'
+            key: opnsense.states.current
+    - uuid: 231b5fb87b4d405cb2bda48fa857049a
+      name: 'CPU jumps'
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: '009900'
+          item:
+            host: 'Template OPNSense Active'
+            key: system.cpu.switches
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: '000099'
+          item:
+            host: 'Template OPNSense Active'
+            key: system.cpu.intr
+    - uuid: 3cf1e98239b74bdf93e9f12dcad73c16
+      name: 'CPU load'
+      type: STACKED
+      ymin_type_1: FIXED
+      graph_items:
+        - color: FFA619
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.cpu.load[percpu,avg1]'
+        - sortorder: '1'
+          color: E86E30
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.cpu.load[percpu,avg5]'
+        - sortorder: '2'
+          color: FF2F26
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.cpu.load[percpu,avg15]'
+    - uuid: d2bdd13ae25c4958934ce5b32ee675c1
+      name: 'CPU utilization (Line)'
+      show_triggers: 'NO'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: FFE819
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.cpu.util[,interrupt]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: E85D17
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.cpu.util[,nice]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: DF26FF
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.cpu.util[,system]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: '1775E8'
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.cpu.util[,user]'
+        - sortorder: '4'
+          color: 03D933
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.cpu.util[,idle]'
+    - uuid: 3c8e8ea0b4fb4501bfda41c66e14b314
+      name: 'Memory Available details (pie)'
+      width: '600'
+      height: '340'
+      yaxismax: '0'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      graph_items:
+        - color: '003300'
+          type: GRAPH_SUM
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[available]'
+        - sortorder: '1'
+          color: '005500'
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[free]'
+        - sortorder: '2'
+          color: '007700'
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[cached]'
+        - sortorder: '3'
+          color: '009900'
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[inactive]'
+    - uuid: 10fdacc2fd534dd49971f4cd34cbda43
+      name: 'Memory usage'
+      show_triggers: 'NO'
+      type: STACKED
+      ymin_type_1: FIXED
+      ymax_type_1: ITEM
+      ymax_item_1:
+        host: 'Template OPNSense Active'
+        key: 'vm.memory.size[total]'
+      graph_items:
+        - color: 00EE00
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[wired]'
+        - sortorder: '1'
+          color: 00CC00
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[active]'
+        - sortorder: '2'
+          color: '007700'
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[inactive]'
+        - sortorder: '3'
+          color: '005500'
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[cached]'
+        - sortorder: '4'
+          color: '003300'
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[free]'
+    - uuid: b6fbef7620c64d9c8cafd42afa387e6a
+      name: 'Memory Usage simple (pie)'
+      width: '600'
+      height: '340'
+      yaxismax: '0'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      graph_items:
+        - color: '003300'
+          item:
+            host: 'Template OPNSense Active'
+            key: 'vm.memory.size[available]'
+        - sortorder: '1'
+          color: 00DD00
+          item:
+            host: 'Template OPNSense Active'
+            key: kt.mem.used
+    - uuid: d2645f047dfe4203aa2e120d77fb1ce9
+      name: 'Network Memory Buffer'
+      show_triggers: 'NO'
+      type: STACKED
+      ymin_type_1: FIXED
+      ymax_type_1: ITEM
+      ymax_item_1:
+        host: 'Template OPNSense Active'
+        key: opnsense.mbuf.max
+      graph_items:
+        - color: B26E16
+          item:
+            host: 'Template OPNSense Active'
+            key: opnsense.mbuf.current
+        - sortorder: '1'
+          color: FFCE8E
+          item:
+            host: 'Template OPNSense Active'
+            key: opnsense.mbuf.cache
+    - uuid: ffc031e21d0f4318b0f387ddb170d3a6
+      name: 'Network Memory Buffer (pie)'
+      width: '600'
+      height: '340'
+      yaxismax: '0'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      graph_items:
+        - color: 5B5B5B
+          type: GRAPH_SUM
+          item:
+            host: 'Template OPNSense Active'
+            key: opnsense.mbuf.max
+        - sortorder: '1'
+          color: FFCE8E
+          item:
+            host: 'Template OPNSense Active'
+            key: opnsense.mbuf.cache
+        - sortorder: '2'
+          color: B26E16
+          item:
+            host: 'Template OPNSense Active'
+            key: opnsense.mbuf.current
+    - uuid: f296bb30d43949c2a2099761f2fe83c0
+      name: 'Swap usage'
+      width: '600'
+      height: '340'
+      yaxismax: '0'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      show_3d: 'YES'
+      graph_items:
+        - color: 5B5B5B
+          type: GRAPH_SUM
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.swap.size[,total]'
+        - sortorder: '1'
+          color: FFFF33
+          item:
+            host: 'Template OPNSense Active'
+            key: 'system.swap.size[,used]'
