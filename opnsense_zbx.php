@@ -1,9 +1,10 @@
 <?php
 /*** 
-pfsense_zbx.php - pfSense Zabbix Interface
+opnsense_zbx.php - OPNSense Zabbix Interface
 Version 1.1.1 - 2021-10-24
 
-Written by Riccardo Bicelli <r.bicelli@gmail.com>
+Original OPNSense Template Written by Riccardo Bicelli <r.bicelli@gmail.com>
+New OPNSense Modifications by Dylan Blanqué <dylan.blanque@gmail.com>
 This program is licensed under Apache 2.0 License
 */
 
@@ -240,7 +241,7 @@ function pfz_speedtest_exec ($ifname, $ipaddr){
 	$filerun = "/tmp/speedtest-run"; 
 	
 	// Issue #82
-	// Sleep random delay in order to avoid problem when 2 pfSense on the same Internet line
+	// Sleep random delay in order to avoid problem when 2 OPNSense on the same Internet line
 	sleep (rand ( 1, 90));
 	
 	if ( (time()-filemtime($filename) > SPEEDTEST_INTERVAL * 3600) || (file_exists($filename)==false) ) {
@@ -874,7 +875,7 @@ function pfz_carp_status($echo = true){
      
 }
 
-// DHCP Checks (copy of status_dhcp_leases.php, waiting for pfsense 2.5)
+// DHCP Checks (copy of status_dhcp_leases.php, waiting for OPNSense 2.5)
 function pfz_remove_duplicate($array, $field) {
 	foreach ($array as $sub) {
 		$cmp[] = $sub[$field];
@@ -886,7 +887,7 @@ function pfz_remove_duplicate($array, $field) {
 	return $new;
 }
 
-// Get DHCP Arrays (copied from status_dhcp_leases.php, waiting for pfsense 2.5, in order to use system_get_dhcpleases();)
+// Get DHCP Arrays (copied from status_dhcp_leases.php, waiting for OPNSense 2.5, in order to use system_get_dhcpleases();)
 function pfz_dhcp_get($valuekey) {
 
 	require_once("config.inc");
@@ -1051,7 +1052,7 @@ function pfz_dhcp_get($valuekey) {
 }
 
 function pfz_dhcpfailover_discovery(){
-	//System functions regarding DHCP Leases will be available in the upcoming release of pfSense, so let's wait
+	//System functions regarding DHCP Leases will be available in the upcoming release of OPNSense, so let's wait
 	require_once("system.inc");
 	$leases = system_get_dhcpleases();
 	
@@ -1142,7 +1143,7 @@ function pfz_get_system_value($section){
 		if($section == "new_version_available") {
 			echo "0";
 		} else {
-			echo "error: cronjob not installed. Run \"php pfsense_zbx.php sysversion_cron\""; 
+			echo "error: cronjob not installed. Run \"php opnsense_zbx.php sysversion_cron\""; 
 		}
 	}
      switch ($section){
