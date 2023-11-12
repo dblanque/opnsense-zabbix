@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-12T02:59:07Z'
+  date: '2023-11-12T03:51:41Z'
   groups:
     - uuid: 4918b88734c54bd094cff7585b5d71fc
       name: 'Templates/Network Devices'
@@ -65,7 +65,7 @@ zabbix_export:
           params: '{$EXPECTED_CARP_STATUS}'
           description: 'Expected CARP Status'
           valuemap:
-            name: 'pfSense CARP Status'
+            name: 'OPNSense CARP Status'
           tags:
             - tag: Application
               value: CARP
@@ -161,9 +161,9 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: 'opnsense.value[carp_status]'
           delay: 30s
-          description: 'pfSense CARP Status'
+          description: 'OPNSense CARP Status'
           valuemap:
-            name: 'pfSense CARP Status'
+            name: 'OPNSense CARP Status'
           tags:
             - tag: Application
               value: CARP
@@ -189,7 +189,7 @@ zabbix_export:
               expression: '(last(/Template OPNSense Active/opnsense.value[gw_status],#1)<>last(/Template OPNSense Active/opnsense.value[gw_status],#2))>0'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '(last(/Template OPNSense Active/opnsense.value[gw_status],#1)<>last(/Template OPNSense Active/opnsense.value[gw_status],#2))=0'
-              name: 'pfSense Gateway Status Changed on {HOST.NAME}'
+              name: 'OPNSense Gateway Status Changed on {HOST.NAME}'
               priority: AVERAGE
               description: 'Gateway Status Change, for use with an acion Script (e.g. update DNS record)'
               manual_close: 'YES'
@@ -217,9 +217,9 @@ zabbix_export:
           triggers:
             - uuid: a47de48b640d4c8990f7affbebb11da8
               expression: 'last(/Template OPNSense Active/opnsense.value[system,new_version_available])=1'
-              name: 'New Version of pfSense Available on {HOST.NAME}'
+              name: 'New Version of OPNSense Available on {HOST.NAME}'
               priority: INFO
-              description: 'A new version of pfSense is available for update.'
+              description: 'A new version of OPNSense is available for update.'
               manual_close: 'YES'
         - uuid: 86623f615bba4d17b565f90ac61ab901
           name: 'OPNSense Available Version'
@@ -386,7 +386,7 @@ zabbix_export:
             - tag: Application
               value: CPU
         - uuid: 0a49ca89d46b40199616ccb1b250e003
-          name: 'CPU $2 time'
+          name: 'CPU user time'
           type: ZABBIX_ACTIVE
           key: 'system.cpu.util[,user]'
           delay: '60'
@@ -711,7 +711,7 @@ zabbix_export:
               delay: 30s
               description: 'Status of Gateway'
               valuemap:
-                name: 'pfSense Gateway Status'
+                name: 'OPNSense Gateway Status'
               tags:
                 - tag: Application
                   value: Gateways
@@ -859,7 +859,7 @@ zabbix_export:
               key: 'opnsense.value[openvpn_clientvalue,{#CLIENT},status]'
               delay: 30s
               valuemap:
-                name: 'pfSense OpenVPN Interface Status'
+                name: 'OPNSense OpenVPN Interface Status'
               tags:
                 - tag: Application
                   value: 'OpenVPN Client'
@@ -889,7 +889,7 @@ zabbix_export:
               key: 'opnsense.value[openvpn_servervalue,{#SERVER},mode]'
               delay: 300s
               valuemap:
-                name: 'pfSense OpenVPN Mode'
+                name: 'OPNSense OpenVPN Mode'
               tags:
                 - tag: Application
                   value: 'OpenVPN Server'
@@ -923,7 +923,7 @@ zabbix_export:
               key: 'opnsense.value[openvpn_servervalue,{#SERVER},status]'
               delay: 60s
               valuemap:
-                name: 'pfSense OpenVPN Interface Status'
+                name: 'OPNSense OpenVPN Interface Status'
               tags:
                 - tag: Application
                   value: 'OpenVPN Server'
@@ -1146,7 +1146,7 @@ zabbix_export:
             - value: '1'
               newvalue: 'Yes'
         - uuid: f4f11519a60a4ea1be767c8331f73179
-          name: 'pfSense CARP Status'
+          name: 'OPNSense CARP Status'
           mappings:
             - value: '0'
               newvalue: Disabled
@@ -1159,7 +1159,7 @@ zabbix_export:
             - value: '4'
               newvalue: Problem
         - uuid: 1d57ec29335143f6b423dcb60eeb6380
-          name: 'pfSense Gateway Status'
+          name: 'OPNSense Gateway Status'
           mappings:
             - value: '0'
               newvalue: Up
@@ -1174,7 +1174,7 @@ zabbix_export:
             - value: '5'
               newvalue: Down
         - uuid: 45699329ad304a43ab6ca081b2c81e94
-          name: 'pfSense OpenVPN Interface Status'
+          name: 'OPNSense OpenVPN Interface Status'
           mappings:
             - value: '0'
               newvalue: Down
@@ -1189,7 +1189,7 @@ zabbix_export:
             - value: '5'
               newvalue: Up/Listening
         - uuid: 3171b07087be4c93925e4abe3b888513
-          name: 'pfSense OpenVPN Mode'
+          name: 'OPNSense OpenVPN Mode'
           mappings:
             - value: '1'
               newvalue: 'Peer to Peer (SSL/TLS)'
@@ -1213,12 +1213,12 @@ zabbix_export:
       expression: 'last(/Template OPNSense Active/opnsense.expected_carp_status)<>0 and last(/Template OPNSense Active/opnsense.value[carp_status])<>{$EXPECTED_CARP_STATUS}'
       name: 'CARP Status not Expected on {HOST.NAME}'
       priority: HIGH
-      description: 'pfSense CARP is not in the state Expected. This means that a failover could be in process.'
+      description: 'OPNSense CARP is not in the state Expected. This means that a failover could be in process.'
     - uuid: 19dcfb45c0c14f8a81dfadc91ab10e06
       expression: '(last(/Template OPNSense Active/opnsense.value[system,version])<>last(/Template OPNSense Active/opnsense.value[system,installed_version]))=1'
       name: 'New Version Available on {HOST.NAME}'
       priority: INFO
-      description: 'Noify of new version of pfsense available'
+      description: 'Noify of new version of OPNSense available'
   graphs:
     - uuid: 5fab072568c84a239ee959f837acab64
       name: 'Active Connections'
