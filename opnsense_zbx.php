@@ -46,12 +46,13 @@ function system_get_version(){
 	return execute_script($prog, $arg);
 }
 
-function openvpn_get_active_clients(){
+function openvpn_get_active_clients($servers_only=true){
 	$prog = "/usr/local/bin/python3";
 	$script = "/usr/local/opnsense/scripts/openvpn/ovpn_status.py";
 	$json_decode = true;
 	$clients = execute_script($prog, $script, $json_decode);
-	return $clients->server;
+	if ($servers_only == true) return $clients->server;
+	return $clients;
 }
 
 function ipsec_get_status(){
@@ -339,21 +340,23 @@ function pfz_openvpn_server_uservalue($unique_id, $valuekey, $default=""){
 
 // OpenVPN Client Discovery
 function pfz_openvpn_clientdiscovery() {
-	 $all_clients = openvpn_get_active_clients();
+	$all_clients = openvpn_get_active_clients(false);
+	$json_string = '{"data":[';
+		
+	if (property_exists($all_clients, "client")) {
+		$all_clients = $all_clients->client;
+		foreach ($all_clients as $client){
+			$name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $client->common_name));
+			$json_string .= '{"{#CLIENT}":"' . $client->vpnid . '"';
+			$json_string .= ',"{#NAME}":"' . $name . '"';
+			$json_string .= '},';
+		}
+	}
 
-	 $json_string = '{"data":[';
+	$json_string = rtrim($json_string,",");
+	$json_string .= "]}";
 
-	 foreach ($all_clients as $client){
-		  $name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $client->common_name));
-		  $json_string .= '{"{#CLIENT}":"' . $client->vpnid . '"';
-		  $json_string .= ',"{#NAME}":"' . $name . '"';
-		  $json_string .= '},';
-	 }
-
-	 $json_string = rtrim($json_string,",");
-	 $json_string .= "]}";
-
-	 echo $json_string;
+	echo $json_string;
 }
 
 function pfz_replacespecialchars($inputstr,$reverse=false){
