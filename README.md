@@ -1,3 +1,9 @@
+# Known Issues, or untested
+* Local OPNSense OVPN Clients may not discovered correctly yet (OVPN Server Clients however are fully functional).
+* DHCP Lease Functions probably don't work.
+* IPSec Functions are untested.
+* CARP Functions are untested.
+
 # Disclaimer
 Out of pure personal need I adapted **R. Bicelli's** _pfSense Zabbix Template_ after the recent Home+Lab License Issue *encouraged* me to migrate to OPNSense.
 This is not yet completely tested in all regards and some keys and functionalities may have errors.
