@@ -1,3 +1,12 @@
+# Disclaimer
+Out of pure personal need I adapted **R. Bicelli's** _pfSense Zabbix Template_ after the recent Home+Lab License Issue *encouraged* me to migrate to OPNSense.
+This is not yet completely tested in all regards and some keys and functionalities may have errors.
+
+I mostly centered myself on fixing OpenVPN monitoring and basic keys support. Feel free to contribute!
+
+Original Zabbix pfSense Template by **R. Bicelli**
+<https://github.com/rbicelli/pfsense-zabbix-template>
+
 # OPNSense Template for Zabbix
 
 To enable this template you must add the following custom keys in the Zabbix Service Configuration.
@@ -6,6 +15,7 @@ To enable this template you must add the following custom keys in the Zabbix Ser
 You may also copy paste it into the config file:
 `/usr/local/etc/zabbix_agentd.conf`
 
+```
 UserParameter=opnsense.mbuf.current,netstat -m | grep "mbuf clusters" | cut -f1 -d ' ' | cut -d '/' -f1
 UserParameter=opnsense.mbuf.cache,netstat -m | grep "mbuf clusters" | cut -f1 -d ' ' | cut -d '/' -f2
 UserParameter=opnsense.mbuf.max,netstat -m | grep "mbuf clusters" | cut -f1 -d ' ' | cut -d '/' -f4
@@ -13,6 +23,7 @@ UserParameter=opnsense.discovery[*],/usr/local/bin/php /root/scripts/opnsense_zb
 UserParameter=opnsense.value[*],/usr/local/bin/php /root/scripts/opnsense_zbx.php $1 $2 $3
 UserParameter=opnsense.states.max,grep "limit states" /tmp/rules.limits | cut -f4 -d ' '
 UserParameter=opnsense.states.current,/usr/local/bin/php /root/scripts/opnsense_zbx.php states
+```
 
 You must also enable Root by changing `AllowRoot=0` to `AllowRoot=1` manually in the configuration file,
 located in `/usr/local/etc/zabbix_agentd.conf`.
