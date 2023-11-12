@@ -388,11 +388,13 @@ function pfz_openvpn_server_uservalue($unique_id, $valuekey, $default=""){
 	$user_id = substr($unique_id,$atpos+1);
 	
 	$servers = pfz_openvpn_get_all_servers();
+	$all_clients = openvpn_get_active_clients();
 	foreach($servers as $server) {
 		if($server['vpnid']==$server_id) {
-			foreach($server['conns'] as $conn) {               
-				if ($conn['common_name']==$user_id){
-					$value = $conn[$valuekey];
+			$clients = $all_clients->$server['vpnid'];
+			foreach($clients as $client) {               
+				if ($client->common_name==$user_id){
+					$value = $client->$valuekey;
 				}
 			}               
 		}
