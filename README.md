@@ -16,3 +16,13 @@ UserParameter=opnsense.states.current,/usr/local/bin/php /root/scripts/opnsense_
 
 You must also enable Root by changing `AllowRoot=0` to `AllowRoot=1` manually in the configuration file,
 located in `/usr/local/etc/zabbix_agentd.conf`.
+
+# Enable System Version Cron
+
+To enable system version update checks, execute the following command in your console:
+`/usr/local/bin/php /root/scripts/opnsense_zbx.php sysversion_cron`
+
+# Cleanup Cron Jobs
+
+To cleanup the cronjob:
+`/usr/local/bin/php /root/scripts/opnsense_zbx.php cron_cleanup`
