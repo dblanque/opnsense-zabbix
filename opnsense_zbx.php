@@ -73,6 +73,9 @@ function pfz_get_gw_statuses(){
 function pfz_test(){
 		$line = "-------------------\n";
 
+		var_dump(pfz_openvpn_server_userdiscovery());
+		return;
+
 		$ovpn_servers = pfz_openvpn_get_all_servers();
 		echo "OPENVPN Servers:\n";
 		print_r($ovpn_servers);
@@ -352,16 +355,18 @@ function pfz_openvpn_server_userdiscovery(){
 	$json_string = '{"data":[';
 	
 	foreach ($servers as $server){
+		$server_id = $server['vpnid'];
 		if ( ($server['mode']=='server_user') || ($server['mode']=='server_tls_user') || ($server['mode']=='server_tls') ) {
-			$clients = $all_clients->server['vpnid'];
-			if (is_array($clients)) {               
+			$clients = $all_clients->$server_id->client_list;
+			if (is_array($clients)) {
 				$name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $server['description']));
 				foreach($clients as $conn) {
-					$common_name = pfz_replacespecialchars($conn['common_name']);
-					$json_string .= '{"{#SERVERID}":"' . $server['vpnid'] . '"';
+					$common_name = pfz_replacespecialchars($conn->common_name);
+					
+					$json_string .= '{"{#SERVERID}":"' . $server_id . '"';
 					$json_string .= ',"{#SERVERNAME}":"' . $name . '"';
-					$json_string .= ',"{#UNIQUEID}":"' . $server['vpnid'] . '+' . $common_name . '"';                         
-					$json_string .= ',"{#USERID}":"' . $conn['common_name'] . '"';    
+					$json_string .= ',"{#UNIQUEID}":"' . $server_id . '+' . $common_name . '"';                         
+					$json_string .= ',"{#USERID}":"' . $conn->common_name . '"';    
 					$json_string .= '},';
 				}
 			}
@@ -370,7 +375,7 @@ function pfz_openvpn_server_userdiscovery(){
 	
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";
-	
+
 	echo $json_string;
 }
 	
