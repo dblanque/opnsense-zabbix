@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-11T22:01:17Z'
+  date: '2023-11-12T02:59:09Z'
   groups:
     - uuid: 4918b88734c54bd094cff7585b5d71fc
       name: 'Templates/Network Devices'
@@ -29,7 +29,7 @@ zabbix_export:
             - uuid: ab1a587699b4463d8f953cf685632118
               name: 'OpenVPN Server {#SERVERNAME}, Client {#USERID}: Bytes Received'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},bytes_recv]'
+              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},bytes_received]'
               delay: 60s
               trends: '0'
               units: bytes
@@ -51,7 +51,7 @@ zabbix_export:
             - uuid: 1b32c21bbd7e4e9dae72ae055ec47247
               name: 'OpenVPN Server {#SERVERNAME}, Client {#USERID}: Connection Time'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},connect_time_unix]'
+              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},connected_since__time_t_]'
               delay: 60s
               trends: '0'
               units: unixtime
@@ -62,7 +62,7 @@ zabbix_export:
             - uuid: ddc373e3c70b428dada80873df980759
               name: 'OpenVPN Server {#SERVERNAME}, Client {#USERID}: Remote Host'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},remote_host]'
+              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},real_address]'
               delay: 60s
               trends: '0'
               value_type: TEXT
@@ -73,7 +73,7 @@ zabbix_export:
             - uuid: 829e49b988a041d3a2e4c7529e9a2f3e
               name: 'OpenVPN Server {#SERVERNAME}, Client {#USERID}: User Name'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},user_name]'
+              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},username]'
               delay: 60s
               trends: '0'
               value_type: TEXT
@@ -81,25 +81,25 @@ zabbix_export:
               tags:
                 - tag: Application
                   value: 'OpenVPN Server Clients'
-            - uuid: 24c5c6a65a2247dea7126eb756edf84a
-              name: 'OpenVPN Server {#SERVERNAME}, Client {#USERID}: Virtual IP Address (IPv6)'
-              type: ZABBIX_ACTIVE
-              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},virtual_addr6]'
-              delay: 60s
-              trends: '0'
-              value_type: TEXT
-              description: 'IPv6 Address assigned from OpenVPN Server'
-              tags:
-                - tag: Application
-                  value: 'OpenVPN Server Clients'
             - uuid: 1a478ba571f54c6fb6bdc4aad7b4cbb6
               name: 'OpenVPN Server {#SERVERNAME}, Client {#USERID}: Virtual IP Address'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},virtual_addr]'
+              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},virtual_address]'
               delay: 60s
               trends: '0'
               value_type: TEXT
               description: 'IP Address assigned from OpenVPN Server'
+              tags:
+                - tag: Application
+                  value: 'OpenVPN Server Clients'
+            - uuid: 24c5c6a65a2247dea7126eb756edf84a
+              name: 'OpenVPN Server {#SERVERNAME}, Client {#USERID}: Virtual IP Address (IPv6)'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[openvpn_server_uservalue,{#UNIQUEID},virtual_ipv6_address]'
+              delay: 60s
+              trends: '0'
+              value_type: TEXT
+              description: 'IPv6 Address assigned from OpenVPN Server'
               tags:
                 - tag: Application
                   value: 'OpenVPN Server Clients'

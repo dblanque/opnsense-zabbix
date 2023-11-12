@@ -30,9 +30,6 @@ require_once('plugins.inc.d/openvpn.inc');
 // For System
 require_once('system.inc'); 
 
-// For DHCP
-// Not implemented
-
 function system_get_version(){
 	$command=escapeshellcmd('/usr/local/sbin/opnsense-version -v');
 	$output = shell_exec($command);
@@ -58,6 +55,12 @@ function pfz_get_states(){
 	return json_decode($output);
 }
 
+function pfz_get_dhcp_leases(){
+	$command=escapeshellcmd('/usr/local/bin/python3 /usr/local/opnsense/scripts/dhcp/get_leases.py');
+	$output = shell_exec($command);
+	return json_decode($output);
+}
+
 function pfz_get_states_count(){
 	return pfz_get_states()->total;
 }
@@ -67,14 +70,12 @@ function pfz_get_gw_statuses(){
 	ob_start();
 	require_once("/usr/local/opnsense/scripts/routes/gateway_status.php");
 	$gw_status = ob_get_clean();
+	return $gw_status;
 }
 
 //Testing function, for template creating purpose
 function pfz_test(){
 		$line = "-------------------\n";
-
-		var_dump(pfz_openvpn_server_userdiscovery());
-		return;
 
 		$ovpn_servers = pfz_openvpn_get_all_servers();
 		echo "OPENVPN Servers:\n";
@@ -391,10 +392,16 @@ function pfz_openvpn_server_uservalue($unique_id, $valuekey, $default=""){
 	$all_clients = openvpn_get_active_clients();
 	foreach($servers as $server) {
 		if($server['vpnid']==$server_id) {
-			$clients = $all_clients->$server['vpnid'];
+			$server_id=$server['vpnid'];
+			$clients = $all_clients->$server_id->client_list;
 			foreach($clients as $client) {               
 				if ($client->common_name==$user_id){
 					$value = $client->$valuekey;
+					switch($valuekey){
+						case "username":
+							if ($client->$valuekey == "UNDEF") $value = "None";
+						break;
+					}
 				}
 			}               
 		}
@@ -405,13 +412,13 @@ function pfz_openvpn_server_uservalue($unique_id, $valuekey, $default=""){
 
 // OpenVPN Client Discovery
 function pfz_openvpn_clientdiscovery() {
-	 $clients = openvpn_get_active_clients();
+	 $all_clients = openvpn_get_active_clients();
 
 	 $json_string = '{"data":[';
 
-	 foreach ($clients as $client){
-		  $name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $client['common_name']));
-		  $json_string .= '{"{#CLIENT}":"' . $client['vpnid'] . '"';
+	 foreach ($all_clients as $client){
+		  $name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $client->common_name));
+		  $json_string .= '{"{#CLIENT}":"' . $client->vpnid . '"';
 		  $json_string .= ',"{#NAME}":"' . $name . '"';
 		  $json_string .= '},';
 	 }
@@ -894,7 +901,7 @@ function pfz_remove_duplicate($array, $field) {
 	return $new;
 }
 
-// Get DHCP Arrays (copied from status_dhcp_leases.php, waiting for OPNSense 2.5, in order to use system_get_dhcpleases();)
+// Get DHCP Arrays
 function pfz_dhcp_get($valuekey) {
 
 	require_once("config.inc");
