@@ -19,10 +19,18 @@ located in `/usr/local/etc/zabbix_agentd.conf`.
 
 # Enable System Version Cron
 
-To enable system version update checks, execute the following command in your console:
-`/usr/local/bin/php /root/scripts/opnsense_zbx.php sysversion_cron`
+Please add the following cronjob to your `/etc/cron.d/opnsense_sysversion`
 
-# Cleanup Cron Jobs
+```
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name command to be executed
+0 9,21	* * *	root	/bin/sh /usr/local/opnsense/scripts/firmware/check.sh
+```
 
-To cleanup the cronjob:
-`/usr/local/bin/php /root/scripts/opnsense_zbx.php cron_cleanup`
+Then restart cron with `/etc/rc.d/cron restart`

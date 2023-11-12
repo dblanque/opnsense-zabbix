@@ -10,10 +10,10 @@ This program is licensed under Apache 2.0 License
 
 // Some Useful defines
 
-define('SPEEDTEST_INTERVAL', 8); //Speedtest Interval (in hours)
 define('CRON_TIME_LIMIT', 300); // Time limit in seconds of speedtest and sysinfo 
 define('DEFAULT_TIME_LIMIT', 30); // Time limit in seconds otherwise
 
+// Imports
 require_once('plugins.inc');
 require_once('config.inc');
 require_once('util.inc');
@@ -24,41 +24,55 @@ require_once('interfaces.inc');
 // For OpenVPN Discovery
 require_once('plugins.inc.d/openvpn.inc');
 
-// For Service Discovery
-//require_once("plugins.inc.d/core.inc");
-
 // For System
 require_once('system.inc'); 
 
+function execute_script($prog, $args, $json_decode=false){
+	$ex = $prog;
+	if (is_array($args))
+		foreach ($args as $arg)
+			$ex .= ' '.$arg;
+	else $ex .= ' '.$args;
+	$command=escapeshellcmd($ex);
+	$result = shell_exec($command);
+	if ($json_decode == true)
+		$result = json_decode($result);
+	return $result;
+}
+
 function system_get_version(){
-	$command=escapeshellcmd('/usr/local/sbin/opnsense-version -v');
-	$output = shell_exec($command);
-	return $output;
+	$prog = "/usr/local/sbin/opnsense-version";
+	$arg = "-v";
+	return execute_script($prog, $arg);
 }
 
 function openvpn_get_active_clients(){
-	$command=escapeshellcmd('/usr/local/bin/python3 /usr/local/opnsense/scripts/openvpn/ovpn_status.py');
-	$output = shell_exec($command);
-	$clients = json_decode($output);
+	$prog = "/usr/local/bin/python3";
+	$script = "/usr/local/opnsense/scripts/openvpn/ovpn_status.py";
+	$json_decode = true;
+	$clients = execute_script($prog, $script, $json_decode);
 	return $clients->server;
 }
 
 function ipsec_get_status(){
-	$command=escapeshellcmd('/usr/local/bin/python3 /usr/local/opnsense/scripts/ipsec/list_status.py');
-	$output = shell_exec($command);
-	return json_decode($output);
+	$prog = "/usr/local/bin/python3";
+	$script = "/usr/local/opnsense/scripts/ipsec/list_status.py";
+	$json_decode = true;
+	return execute_script($prog, $script, $json_decode);
 }
 
 function pfz_get_states(){
-	$command=escapeshellcmd('/usr/local/bin/python3 /usr/local/opnsense/scripts/filter/list_states.py');
-	$output = shell_exec($command);
-	return json_decode($output);
+	$prog = "/usr/local/bin/python3";
+	$script = "/usr/local/opnsense/scripts/filter/list_states.py";
+	$json_decode = true;
+	return execute_script($prog, $script, $json_decode);
 }
 
 function pfz_get_dhcp_leases(){
-	$command=escapeshellcmd('/usr/local/bin/python3 /usr/local/opnsense/scripts/dhcp/get_leases.py');
-	$output = shell_exec($command);
-	return json_decode($output);
+	$prog = "/usr/local/bin/python3";
+	$script = "/usr/local/opnsense/scripts/dhcp/get_leases.py";
+	$json_decode = true;
+	return execute_script($prog, $script, $json_decode);
 }
 
 function pfz_get_states_count(){
@@ -133,7 +147,6 @@ function pfz_test(){
 		print_r($installed_packages);
 }
 
-
 // Interface Discovery
 // Improved performance
 function pfz_interface_discovery($is_wan=false,$is_cron=false) {
@@ -180,91 +193,6 @@ function pfz_interface_discovery($is_wan=false,$is_cron=false) {
 	echo $json_string;
 }
 
-
-//Interface Speedtest
-function pfz_interface_speedtest_value($ifname, $value){	
-	$tvalue = explode(".", $value);    
-	
-	if (count($tvalue)>1) {
-		$value = $tvalue[0];
-		$subvalue = $tvalue[1];
-	}        
-	
-	//If the interface has a gateway is considered WAN, so let's do the speedtest
-	$filename = "/tmp/speedtest-$ifname";
-	
-	if (file_exists($filename)) {
-		$speedtest_data = json_decode(file_get_contents($filename), true) ?? [];
-		
-		if (array_key_exists($value, $speedtest_data)) {
-			if ($subvalue == false) 
-				echo $speedtest_data[$value];
-			else
-				echo $speedtest_data[$value][$subvalue];
-		}	
-	}
-			
-}
-
-// This is supposed to run via cron job
-function pfz_speedtest_cron(){
-	require_once("plugins.inc");
-	$ifdescrs = get_configured_interface_with_descr();
-	$ifaces = get_interface_list();
-	$pf_interface_name='';
-	$subvalue=false;    
-							   
-	$ifcs = pfz_interface_discovery(true, true);    
-	
-	foreach ($ifcs as $ifname) {
-		  foreach ($ifdescrs as $ifn => $ifd){
-			  $ifinfo = get_interfaces_info($ifn);
-			  if($ifinfo['hwif']==$ifname) {
-			  	$pf_interface_name = $ifn;
-			  	break;
-			  }
-		  }	
-		  pfz_speedtest_exec($ifname, $ifinfo['ipaddr']);
-	}
-}
-
-//installs a cron job for speedtests
-function pfz_speedtest_cron_install($enable=true){
-	//Install Cron Job
-	$command = "/usr/local/bin/php " . __FILE__ . " speedtest_cron";
-	install_cron_job($command, $enable, $minute = "*/15", "*", "*", "*", "*", "root", true);
-}        	
-
-
-// 2023-02-26:
-// Fixed issue #127
-function pfz_speedtest_exec ($ifname, $ipaddr){
-	
-	$filename = "/tmp/speedtest-$ifname";
-	$filetemp = "$filename.tmp";
-	$filerun = "/tmp/speedtest-run"; 
-	
-	// Issue #82
-	// Sleep random delay in order to avoid problem when 2 OPNSense on the same Internet line
-	sleep (rand ( 1, 90));
-	
-	if ( (time()-filemtime($filename) > SPEEDTEST_INTERVAL * 3600) || (file_exists($filename)==false) ) {
-	  	// file is older than SPEEDTEST_INTERVAL
-	  	if ( (time()-filemtime($filerun) > 180 ) ) @unlink($filerun);
-
-		if (file_exists($filerun)==false) {	  			  		
-	  		touch($filerun);
-	  		$st_command = "/usr/local/bin/speedtest --secure --source $ipaddr --json > $filetemp";
-			exec ($st_command);
-			rename($filetemp,$filename);
-			@unlink($filerun);
-		}
-	}	
-	
-	return true;
-}
-
-
 // OpenVPN Server Discovery
 function pfz_openvpn_get_all_servers(){
 	 $servers = openvpn_get_remote_access_servers();
@@ -273,7 +201,6 @@ function pfz_openvpn_get_all_servers(){
 #	$servers = array_merge($servers,$sk_servers);
 	 return ($servers);
 }
-
 
 function pfz_openvpn_serverdiscovery() {
 	 $servers = pfz_openvpn_get_all_servers();
@@ -1065,6 +992,7 @@ function pfz_dhcp_get($valuekey) {
 
 }
 
+// ! Not working or tested on OPNSense yet.
 function pfz_dhcpfailover_discovery(){
 	//System functions regarding DHCP Leases will be available in the upcoming release of OPNSense, so let's wait
 	require_once("system.inc");
@@ -1084,6 +1012,7 @@ function pfz_dhcpfailover_discovery(){
 	echo $json_string;
 }
 
+// ! Not working or tested on OPNSense yet.
 function pfz_dhcp_check_failover(){
 	// Check DHCP Failover Status
 	// Returns number of failover pools which state is not normal or
@@ -1098,6 +1027,7 @@ function pfz_dhcp_check_failover(){
 	return $ret;	
 }
 
+// ! Not working or tested on OPNSense yet.
 function pfz_dhcp($section, $valuekey=""){
 	switch ($section){
 		case "failover":
@@ -1121,11 +1051,12 @@ function pfz_packages_uptodate(){
 	return true;
 }
 
+// ! Not working or tested on OPNSense yet.
 function pfz_sysversion_cron_install($enable=true){
 	//Install Cron Job
 	$command = "/usr/local/bin/php " . __FILE__ . " systemcheck_cron";
 	install_cron_job($command, $enable, $minute = "0", "9,21", "*", "*", "*", "root", true);
-}    
+}
 
 // System information takes a long time to get on slower systems. 
 // So it is saved via a cronjob.
@@ -1417,10 +1348,6 @@ switch ($mainArgument){
 	 case "gw_status":
 		  pfz_gw_rawstatus();
 		  break;
-	 case "if_speedtest_value":
-		  pfz_speedtest_cron_install();
-	 	  pfz_interface_speedtest_value($argv[2],$argv[3]);
-	 	  break;
 	 case "openvpn_servervalue":
 		  pfz_openvpn_servervalue($argv[2],$argv[3]);
 		  break;
@@ -1461,12 +1388,7 @@ switch ($mainArgument){
 	 case "file_exists":
 	 	  pfz_file_exists($argv[2]);
 	 	  break;
-	 case "speedtest_cron":
-	 	  pfz_speedtest_cron_install();
-	 	  pfz_speedtest_cron();
-	 	  break;
 	 case "cron_cleanup":
-	 	  pfz_speedtest_cron_install(false);
 	 	  pfz_sysversion_cron_install(false);
 	 	  break;
 	 case "smart_status":
