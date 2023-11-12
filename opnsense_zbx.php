@@ -1078,7 +1078,7 @@ function pfz_sysversion_cron (){
 	if (file_exists($filename)==false) {	  
 		touch($filename);
 		file_put_contents($filename, $versionDataJson);
-	}	
+	}
 	return true;
 } 
 
@@ -1373,7 +1373,6 @@ switch ($mainArgument){
 		  pfz_get_if_name($argv[2]);
 		  break;
 	 case "sysversion_cron":
-		  pfz_sysversion_cron_install();
 		  pfz_sysversion_cron();
 		  break;
 	 case "system":
