@@ -1,3 +1,12 @@
+# Disclaimer
+Out of pure personal need I adapted **R. Bicelli's** _pfSense Zabbix Template_ after the recent Home+Lab License Issue *encouraged* me to migrate to OPNSense.
+This is not yet completely tested in all regards and some keys and functionalities may have errors.
+
+I mostly centered myself on fixing OpenVPN monitoring and basic keys support. Feel free to contribute!
+
+Original Zabbix pfSense Template by **R. Bicelli**
+<https://github.com/rbicelli/pfsense-zabbix-template>
+
 # OPNSense Template for Zabbix
 
 To enable this template you must add the following custom keys in the Zabbix Service Configuration.
