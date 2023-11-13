@@ -778,55 +778,54 @@ function pfz_get_temperature($sensorid){
 
 
 function pfz_carp_status($echo = true){
-	 //Detect CARP Status
-	 $config = parse_config();
-	 $status_return = 0;
-	 $status = pfz_get_carp_status();
-	 $carp_detected_problems = get_single_sysctl("net.inet.carp.demotion");
+	//Detect CARP Status
+	$config = parse_config();
+	$status_return = 0;
+	$status = pfz_get_carp_status();
+	$carp_detected_problems = get_single_sysctl("net.inet.carp.demotion");
 
-	 if ($status->status_msg == "Could not locate any defined CARP interfaces.")
-	 	return $status_return;
+	if ($status->status_msg == "Could not locate any defined CARP interfaces.")
+	return $status_return;
 
-	 //CARP is disabled
-	 $ret = 0;
-	 
-	 if ($status != 0) { //CARP is enabled
+	//CARP is disabled
+	$ret = 0;
 
-		  if ($carp_detected_problems != 0) {                              
-			   //There's some Major Problems with CARP
-			   $ret = 4;
-			   if ($echo == true) echo $ret;   
-			   return $ret;
-		  }
-					
-		  $status_changed = false;
-		  $prev_status = "";
-		  foreach ($config['virtualip']['vip'] as $carp) {
-			 if ($carp['mode'] != "carp") {
-				 continue;
-			 }
-			   $if_status = get_carp_interface_status("_vip{$carp['uniqid']}");
+	if ($status != 0) { //CARP is enabled
 
-			   if ( ($prev_status != $if_status) && (empty($if_status)==false) ) { //Some glitches with GUI
-					if ($prev_status!="") $status_changed = true;
-					$prev_status = $if_status;
-			   }
-		  }          
-		  if ($status_changed) {
-			   //CARP Status is inconsistent across interfaces
-			   $ret=3;
-			   echo 3;          
-		  } else {
-			   if ($prev_status=="MASTER")
-					$ret = 1;                    
-			   else
-					$ret = 2;
-		  }      
-	 }
-	 
-	 if ($echo == true) echo $ret;   
-	 return $ret;
-	 
+		if ($carp_detected_problems != 0) {                              
+			//There's some Major Problems with CARP
+			$ret = 4;
+			if ($echo == true) echo $ret;   
+			return $ret;
+		}
+				
+		$status_changed = false;
+		$prev_status = "";
+		foreach ($config['virtualip']['vip'] as $carp) {
+			if ($carp['mode'] != "carp") {
+				continue;
+			}
+			$if_status = get_carp_interface_status("_vip{$carp['uniqid']}");
+
+			if ( ($prev_status != $if_status) && (empty($if_status)==false) ) { //Some glitches with GUI
+				if ($prev_status!="") $status_changed = true;
+				$prev_status = $if_status;
+			}
+		}          
+		if ($status_changed) {
+			//CARP Status is inconsistent across interfaces
+			$ret=3;
+			echo 3;          
+		} else {
+			if ($prev_status=="MASTER")
+				$ret = 1;                    
+			else
+				$ret = 2;
+		}      
+	}
+
+	if ($echo == true) echo $ret;   
+	return $ret;
 }
 
 // DHCP Checks (copy of status_dhcp_leases.php, waiting for OPNSense 2.5)
