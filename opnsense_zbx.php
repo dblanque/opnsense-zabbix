@@ -25,7 +25,7 @@ require_once('interfaces.inc');
 require_once('plugins.inc.d/openvpn.inc');
 
 // For System
-require_once('system.inc'); 
+require_once('system.inc');
 
 function execute_script($prog, $args, $json_decode=false){
 	$ex = $prog;
@@ -543,7 +543,7 @@ function pfz_gw_value($gw, $valuekey) {
 // IPSEC Discovery
 function pfz_ipsec_discovery_ph1(){
 	
-	require_once("plugins.d/ipsec.inc");	
+	require_once("plugins.d/ipsec.inc");
 	global $config;
 	$config = parse_config();
 	$a_phase1 = &$config['ipsec']['phase1'];
@@ -570,9 +570,9 @@ function pfz_ipsec_ph1($ikeid,$valuekey){
 	require_once("ipsec.inc");
 	global $config;
 	$config = parse_config();
-	$a_phase1 = &$config['ipsec']['phase1'];	
+	$a_phase1 = &$config['ipsec']['phase1'];
 
-	$value = "";	
+	$value = "";
 	switch ($valuekey) {
 		case 'status':
 			$value = pfz_ipsec_status($ikeid);
@@ -625,7 +625,7 @@ function pfz_ipsec_ph2($uniqid, $valuekey){
 	require_once("ipsec.inc");
 	global $config;
 	$config = parse_config();
-	$a_phase2 = &$config['ipsec']['phase2'];	
+	$a_phase2 = &$config['ipsec']['phase2'];
 	
 	$valuecfr = explode(".",$valuekey);
 		
@@ -633,7 +633,7 @@ function pfz_ipsec_ph2($uniqid, $valuekey){
 		case 'status':
 			$idarr = explode(".", $uniqid);
 			$statuskey = "state";
-			if (isset($valuecfr[1])) $statuskey = $valuecfr[1]; 
+			if (isset($valuecfr[1])) $statuskey = $valuecfr[1];
 			$value = pfz_ipsec_status($idarr[0],$idarr[1],$statuskey);
 			break;
 		case 'disabled':
@@ -1036,7 +1036,7 @@ function pfz_dhcp_check_failover(){
 			$ret++;
 		}
 	}		
-	return $ret;	
+	return $ret;
 }
 
 // ! Not working or tested on OPNSense yet.
@@ -1093,14 +1093,14 @@ function pfz_sysversion_cron (){
 
 //System Information
 function pfz_get_system_value($section){
-	$filename = "/tmp/pkg_upgrade.json";	
+	$filename = "/tmp/pkg_upgrade.json";
 	if(file_exists($filename)) {
 		$sysVersion = json_decode(file_get_contents($filename), true);
 	} else {
 		if($section == "new_version_available") {
 			echo "0";
 		} else {
-			echo "error: cronjob not installed. Run \"php opnsense_zbx.php sysversion_cron\""; 
+			echo "error: cronjob not installed. Run \"php opnsense_zbx.php sysversion_cron\"";
 		}
 	}
 	 switch ($section){
