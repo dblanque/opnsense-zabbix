@@ -1,5 +1,3 @@
-# OPNSense Template for Zabbix
-
 ## Introduction
 Out of pure personal need I adapted **R. Bicelli's** _pfSense Zabbix Template_ after the recent Home+Lab License Issue *encouraged* me to migrate to OPNSense.
 This is not yet completely tested in all regards and some keys and functionalities may have errors.
@@ -22,7 +20,7 @@ Original Zabbix pfSense Template by **R. Bicelli**
 ### Added
 * P2P TLS OpenVPN Server Remote Address Item Monitoring
 
-# Known Issues, or untested
+## Known Issues, or untested
 * OPNSense OpenVPN Clients (as in site to site clients) may not be discovered correctly yet.
 * DHCP Lease Functions *probably* don't work.
 * **IPSec Functions are untested**.
