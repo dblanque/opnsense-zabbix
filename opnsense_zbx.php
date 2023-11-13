@@ -542,7 +542,7 @@ function pfz_gw_value($gw, $valuekey) {
 
 // IPSEC Discovery
 function pfz_ipsec_discovery_ph1(){
-	
+
 	require_once("plugins.d/ipsec.inc");
 	global $config;
 	$config = parse_config();
