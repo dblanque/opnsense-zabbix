@@ -88,6 +88,13 @@ function pfz_get_gw_statuses(){
 	return $gw_status;
 }
 
+function pfz_get_carp_status(){
+	$prog = "/usr/local/bin/php";
+	$script = "/usr/local/opnsense/scripts/interfaces/carp_global_status.php";
+	$json_decode = true;
+	return execute_script($prog, $script, $json_decode);
+}
+
 //Testing function, for template creating purpose
 function pfz_test(){
 		$line = "-------------------\n";
@@ -404,7 +411,7 @@ function pfz_services_discovery(){
 	 foreach ($services as $service){
 		  if (!empty($service['name'])) {
 			   
-			   $status = get_service_status($service);
+			   $status = service_status($service);
 			   if ($status="") $status = 0;
 
 			   $id="";               
@@ -457,7 +464,7 @@ function pfz_service_value($name,$value){
 			   switch ($value) {
 			   
 					case "status":
-						 $status = get_service_status($service);
+						 $status = service_status($service);
 						 if ($status=="") $status = 0;
 						 echo $status;
 						 return;
@@ -772,10 +779,13 @@ function pfz_get_temperature($sensorid){
 
 function pfz_carp_status($echo = true){
 	 //Detect CARP Status
-	 global $config;
+	 $config = parse_config();
 	 $status_return = 0;
-	 $status = get_carp_status();
+	 $status = pfz_get_carp_status();
 	 $carp_detected_problems = get_single_sysctl("net.inet.carp.demotion");
+
+	 if ($status->status_msg == "Could not locate any defined CARP interfaces.")
+	 	return $status_return;
 
 	 //CARP is disabled
 	 $ret = 0;
