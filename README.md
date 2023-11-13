@@ -1,5 +1,5 @@
 # Known Issues, or untested
-* Local OPNSense OVPN Clients may not discovered correctly yet (OVPN Server Clients however are fully functional).
+* Local OPNSense OVPN Clients may not be discovered correctly yet (OVPN Server Clients however are fully functional).
 * DHCP Lease Functions probably don't work.
 * IPSec Functions are untested.
 * CARP Functions are untested.
