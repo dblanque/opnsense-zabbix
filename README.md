@@ -1,21 +1,6 @@
-# Tested Functionalities
-* Service Discovery
-* OpenVPN Server Discovery and Statistics
-* OpenVPN Server Clients Discovery
-* All default FreeBSD Items
-* Network Statistics
-* Gateway Discovery
+# OPNSense Template for Zabbix
 
-# Added
-* P2P TLS OpenVPN Server Remote Address Item Monitoring
-
-# Known Issues, or untested
-* OPNSense OpenVPN Clients (as in site to site clients) may not be discovered correctly yet.
-* DHCP Lease Functions *probably* don't work.
-* **IPSec Functions are untested**.
-* **CARP Functions are untested**.
-
-# Disclaimer
+## Introduction
 Out of pure personal need I adapted **R. Bicelli's** _pfSense Zabbix Template_ after the recent Home+Lab License Issue *encouraged* me to migrate to OPNSense.
 This is not yet completely tested in all regards and some keys and functionalities may have errors.
 
@@ -24,7 +9,28 @@ I mostly centered myself on fixing OpenVPN monitoring and basic keys support. Fe
 Original Zabbix pfSense Template by **R. Bicelli**
 <https://github.com/rbicelli/pfsense-zabbix-template>
 
-# OPNSense Template for Zabbix
+## Functionalities
+
+### Tested
+* Service Discovery
+* OpenVPN Server Discovery and Statistics
+* OpenVPN Server Clients Discovery
+* All default FreeBSD Items
+* Network Statistics
+* Gateway Discovery
+
+### Added
+* P2P TLS OpenVPN Server Remote Address Item Monitoring
+
+# Known Issues, or untested
+* OPNSense OpenVPN Clients (as in site to site clients) may not be discovered correctly yet.
+* DHCP Lease Functions *probably* don't work.
+* **IPSec Functions are untested**.
+* **CARP Functions are untested**.
+
+## Installation
+
+### Zabbix Configuration
 
 To enable this template you must add the following custom keys in the Zabbix Service Configuration.
 `Services → Zabbix Agent → Settings`
@@ -45,7 +51,7 @@ UserParameter=opnsense.states.current,/usr/local/bin/php /root/scripts/opnsense_
 You must also enable Root by changing `AllowRoot=0` to `AllowRoot=1` manually in the configuration file,
 located in `/usr/local/etc/zabbix_agentd.conf`.
 
-# Enable System Version Cron
+### Enable System Version Cron
 
 Please add the following cronjob to your `/etc/cron.d/opnsense_sysversion`
 
