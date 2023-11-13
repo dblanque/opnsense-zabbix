@@ -135,7 +135,7 @@ function pfz_test(){
 		$a_phase2 = &$config['ipsec']['phase2'];
 		$status = ipsec_get_status();
 		echo "IPsec Status: \n";
-		print_r($status);		
+		print_r($status);
 		
 		$a_phase1 = &$config['ipsec']['phase1'];
 		$a_phase2 = &$config['ipsec']['phase2'];
@@ -578,7 +578,7 @@ function pfz_ipsec_ph1($ikeid,$valuekey){
 			$value = pfz_ipsec_status($ikeid);
 			break;
 		case 'disabled':
-			$value = "0";		
+			$value = "0";
 		default:
 			foreach ($a_phase1 as $data) {
 				if ($data['ikeid'] == $ikeid) {
@@ -999,7 +999,7 @@ function pfz_dhcp_get($valuekey) {
 			break;
 		case "leases":
 		default:
-			return $leases;		
+			return $leases;
 	}
 
 }
