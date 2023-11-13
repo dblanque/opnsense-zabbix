@@ -7,6 +7,8 @@ I mostly centered myself on fixing OpenVPN monitoring and basic keys support. Fe
 Original Zabbix pfSense Template by **R. Bicelli**
 <https://github.com/rbicelli/pfsense-zabbix-template>
 
+*Tested on Zabbix 6.0 LTS*
+
 ## Functionalities
 
 ### Tested
