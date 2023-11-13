@@ -1,8 +1,19 @@
+# Tested Functionalities
+* Service Discovery
+* OpenVPN Server Discovery and Statistics
+* OpenVPN Server Clients Discovery
+* All default FreeBSD Items
+* Network Statistics
+* Gateway Discovery
+
+# Added
+* P2P TLS OpenVPN Server Remote Address Item Monitoring
+
 # Known Issues, or untested
-* Local OPNSense OVPN Clients may not be discovered correctly yet (OVPN Server Clients however are fully functional).
-* DHCP Lease Functions probably don't work.
-* IPSec Functions are untested.
-* CARP Functions are untested.
+* OPNSense OpenVPN Clients (as in site to site clients) may not be discovered correctly yet.
+* DHCP Lease Functions *probably* don't work.
+* **IPSec Functions are untested**.
+* **CARP Functions are untested**.
 
 # Disclaimer
 Out of pure personal need I adapted **R. Bicelli's** _pfSense Zabbix Template_ after the recent Home+Lab License Issue *encouraged* me to migrate to OPNSense.
