@@ -1116,10 +1116,7 @@ function pfz_get_system_value($section){
 	}
 	 switch ($section){
 		  case "version":
-				if ($sysVersion_exists != true)
-					echo(pfz_get_version());
-				else
-					echo(pfz_get_new_version($sysVersion, pfz_get_version()));
+				echo(pfz_get_new_version($sysVersion, pfz_get_version()));
 				break;
 		  case "installed_version":
 				echo(pfz_get_version());
