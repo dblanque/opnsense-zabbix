@@ -3,7 +3,7 @@
 opnsense_zbx.php - OPNSense Zabbix Interface
 Version 1.1.1 - 2021-10-24
 
-Original OPNSense Template Written by Riccardo Bicelli <r.bicelli@gmail.com>
+Original pfSense Template Written by Riccardo Bicelli <r.bicelli@gmail.com>
 New OPNSense Modifications by Dylan Blanqué <dylan.blanque@gmail.com>
 This program is licensed under Apache 2.0 License
 */
