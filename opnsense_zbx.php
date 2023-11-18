@@ -1106,18 +1106,20 @@ function pfz_get_new_version($sysVersion, $currentVersion){
 //System Information
 function pfz_get_system_value($section){
 	$filename = "/tmp/pkg_upgrade.json";
-	if(file_exists($filename)) {
+	$sysVersion_exists = file_exists($filename);
+	if ($sysVersion_exists == true) {
 		$sysVersion = json_decode(file_get_contents($filename), true);
 	} else {
 		if ($section == "new_version_available") {
 			echo "0";
-		} else {
-			echo "error: cronjob not installed. Run \"php opnsense_zbx.php sysversion_cron\"";
 		}
 	}
 	 switch ($section){
 		  case "version":
-				echo(pfz_get_new_version($sysVersion, pfz_get_version()));
+				if ($sysVersion_exists != true)
+					echo $filename." not found, waiting for next sysversion cronjob.";
+				else
+					echo(pfz_get_new_version($sysVersion, pfz_get_version()));
 				break;
 		  case "installed_version":
 				echo(pfz_get_version());
