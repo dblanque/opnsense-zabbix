@@ -1052,6 +1052,7 @@ function pfz_dhcp($section, $valuekey=""){
 //Packages
 function pfz_get_packages_upgrade(){
 	$command=escapeshellcmd('/bin/sh /usr/local/opnsense/scripts/firmware/check.sh');
+	$result = shell_exec($command);
 	$output = file_get_contents("/tmp/pkg_upgrade.json");
 	return json_decode($output);
 }
@@ -1091,13 +1092,24 @@ function pfz_sysversion_cron (){
 	return true;
 } 
 
+function pfz_get_version(){
+	return system_get_version();
+}
+
+function pfz_get_new_version($sysVersion, $currentVersion){
+	$filename = "/tmp/pkg_upgrade.json";
+	foreach ($sysVersion["upgrade_packages"] as $pkg_k => $pkg_v)
+		if ($pkg_v["name"] == "opnsense") return $pkg_v["new_version"];
+	return $currentVersion;
+}
+
 //System Information
 function pfz_get_system_value($section){
 	$filename = "/tmp/pkg_upgrade.json";
 	if(file_exists($filename)) {
 		$sysVersion = json_decode(file_get_contents($filename), true);
 	} else {
-		if($section == "new_version_available") {
+		if ($section == "new_version_available") {
 			echo "0";
 		} else {
 			echo "error: cronjob not installed. Run \"php opnsense_zbx.php sysversion_cron\"";
@@ -1105,21 +1117,22 @@ function pfz_get_system_value($section){
 	}
 	 switch ($section){
 		  case "version":
-			   echo( $sysVersion['product_version']);
-				if ($sysVersion["upgrade_major_version"]!="")
-					echo $sysVersion["upgrade_major_version"];
-			   break;
+				echo(pfz_get_new_version($sysVersion, pfz_get_version()));
+				break;
 		  case "installed_version":
-					echo($sysVersion['product_version']);
-			   break;
+				echo(pfz_get_version());
+				break;
 		  case "new_version_available":
-			   if ($sysVersion["upgrade_major_version"]=="")
-					echo "0";
-			   else
+				$new_version_available = false;
+				foreach ($sysVersion["upgrade_packages"] as $pkg_k => $pkg_v)
+					if ($pkg_v["name"] == "opnsense") $new_version_available = true;
+				if ($new_version_available==true)
 					echo "1";
-			   break;
+				else
+					echo "0";
+				break;
 		  case "packages_update":
-		  		echo $sysVersion["packages_update"];
+		  		echo $sysVersion["upgrade_packages"];
 		  		break;
 	 }
 }
