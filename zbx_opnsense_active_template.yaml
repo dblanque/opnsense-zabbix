@@ -1218,7 +1218,7 @@ zabbix_export:
       expression: '(last(/Template OPNSense Active/opnsense.value[system,version])<>last(/Template OPNSense Active/opnsense.value[system,installed_version]))=1'
       name: 'New Version Available on {HOST.NAME}'
       priority: INFO
-      description: 'Noify of new version of OPNSense available'
+      description: 'Notify of new version of OPNSense available'
   graphs:
     - uuid: 5fab072568c84a239ee959f837acab64
       name: 'Active Connections'
