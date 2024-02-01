@@ -7,6 +7,8 @@ I mostly centered myself on fixing OpenVPN monitoring and basic keys support. Fe
 Original Zabbix pfSense Template by **R. Bicelli**
 <https://github.com/rbicelli/pfsense-zabbix-template>
 
+*2024-02-01: Fix for OPNSense 24.1 `get_interfaces_info()` function deprecation was implemented.
+
 *Tested on Zabbix 6.0 LTS*
 
 ## Functionalities

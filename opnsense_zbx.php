@@ -26,6 +26,7 @@ require_once('plugins.inc.d/openvpn.inc');
 
 // For System
 require_once('system.inc');
+require dirname(__FILE__).'/legacy_func.php';
 
 function execute_script($prog, $args, $json_decode=false){
 	$ex = $prog;
@@ -162,7 +163,7 @@ function pfz_interface_discovery($is_wan=false,$is_cron=false) {
 	$ifaces = get_interface_list();
 	$ifcs=array();
 	$if_ret=array();
-	$ifcs = get_interfaces_info();
+	$ifcs = legacy_config_get_interfaces(['virtual' => false]);
 	$ifinfo = $ifcs;
 
 	$json_string = '{"data":[';
@@ -1426,3 +1427,4 @@ switch ($mainArgument){
 	 default:
 		  pfz_test();
 }
+?>
