@@ -185,11 +185,14 @@ function pfz_interface_discovery($is_wan=false,$is_cron=false) {
 						break;
 				}
 		}
-		//WORKHERE
-		if ( ($is_wan==false) ||  (($is_wan==true) && (($has_gw==true) || ($has_public_ip==true)) && ($is_vpn==false)) ) { 
+		if (strlen($ifcs[$ifdescr]["if"]) > 0 && ($is_wan==false) || (($is_wan==true) && (($has_gw==true) || ($has_public_ip==true)) && ($is_vpn==false)) ) { 
+			if (strlen($ifcs[$ifdescr]["descr"]) < 1)
+				$descr = $ifcs[$ifdescr]["if"];
+			else
+				$descr = $ifcs[$ifdescr]["descr"];
 			$if_ret[]=$hwif;
 			$json_string .= '{"{#IFNAME}":"' . $ifcs[$ifdescr]["if"] . '"';
-			$json_string .= ',"{#IFDESCR}":"' . $ifcs[$ifdescr]["descr"] . '"';
+			$json_string .= ',"{#IFDESCR}":"' . $descr . '"';
 			$json_string .= '},';
 		}
 	
