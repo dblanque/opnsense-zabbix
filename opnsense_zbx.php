@@ -217,14 +217,6 @@ function pfz_interface_discovery($is_wan=false,$is_cron=false) {
 			$json_string .= ',"{#IFDESCR}":"' . $out_descr . '"';
 			$json_string .= '},';
 		}
-		echo "\nName:\n";
-		print($if_name);
-		echo "\nHas GW:\n";
-		print_r($has_gw);
-		echo "\nIS VPN:\n";
-		print_r($is_vpn);
-		echo "\nHas Public IP\n";
-		print_r($has_public_ip);
 	}
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";
