@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-12T03:51:43Z'
+  date: '2024-02-02T04:59:32Z'
   groups:
     - uuid: 4918b88734c54bd094cff7585b5d71fc
       name: 'Templates/Network Devices'
@@ -24,6 +24,7 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: 'opnsense.discovery[openvpn_server_user]'
           delay: 30s
+          lifetime: 7d
           description: 'Discovery of clients connected to OpenVPN Server in User Auth Mode'
           item_prototypes:
             - uuid: ab1a587699b4463d8f953cf685632118

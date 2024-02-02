@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-12T03:51:41Z'
+  date: '2024-02-02T04:59:27Z'
   groups:
     - uuid: 4918b88734c54bd094cff7585b5d71fc
       name: 'Templates/Network Devices'
@@ -191,7 +191,7 @@ zabbix_export:
               recovery_expression: '(last(/Template OPNSense Active/opnsense.value[gw_status],#1)<>last(/Template OPNSense Active/opnsense.value[gw_status],#2))=0'
               name: 'OPNSense Gateway Status Changed on {HOST.NAME}'
               priority: AVERAGE
-              description: 'Gateway Status Change, for use with an acion Script (e.g. update DNS record)'
+              description: 'Gateway Status Change, for use with an action Script (e.g. update DNS record)'
               manual_close: 'YES'
         - uuid: f1ff72bb97d54ba2a51768482b9461db
           name: 'OPNSense Installed Version'
@@ -219,7 +219,7 @@ zabbix_export:
               expression: 'last(/Template OPNSense Active/opnsense.value[system,new_version_available])=1'
               name: 'New Version of OPNSense Available on {HOST.NAME}'
               priority: INFO
-              description: 'A new version of OPNSense is available for update.'
+              description: 'A new version of OPNSense is available for update'
               manual_close: 'YES'
         - uuid: 86623f615bba4d17b565f90ac61ab901
           name: 'OPNSense Available Version'
@@ -362,7 +362,7 @@ zabbix_export:
             - tag: Application
               value: CPU
         - uuid: b55ff4a7987f4793a0ca41c307faea19
-          name: 'CPU $2 time'
+          name: 'CPU nice time'
           type: ZABBIX_ACTIVE
           key: 'system.cpu.util[,nice]'
           delay: '60'
@@ -825,6 +825,129 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: 8837209c698a4c6eb690580e28ba1b9b
+              name: 'Bytes Received on {#IFDESCR}'
+              type: DEPENDENT
+              key: 'opnsense.interfaces[{#IFNAME}, "bytes received"]'
+              delay: '0'
+              history: 7d
+              units: bytes
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["bytes received"]'
+              master_item:
+                key: 'opnsense.interfaces[{#IFNAME}]'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: 48a73ae51be54ca0beb4e18c67ea5d86
+              name: 'Bytes Transmitted on {#IFDESCR}'
+              type: DEPENDENT
+              key: 'opnsense.interfaces[{#IFNAME}, "bytes transmitted"]'
+              delay: '0'
+              history: 7d
+              units: bytes
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["bytes transmitted"]'
+              master_item:
+                key: 'opnsense.interfaces[{#IFNAME}]'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: b93bf7c29e6b433b82cfc0bb4b3aef04
+              name: 'Detected Collisions on {#IFDESCR}'
+              type: DEPENDENT
+              key: 'opnsense.interfaces[{#IFNAME}, "collisions"]'
+              delay: '0'
+              history: 7d
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["packets transmitted"]'
+              master_item:
+                key: 'opnsense.interfaces[{#IFNAME}]'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: a0cf7ab6b0374b07809bcc7c3d36f7c5
+              name: 'Network Interface Card for {#IFDESCR}'
+              type: DEPENDENT
+              key: 'opnsense.interfaces[{#IFNAME}, "device"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["device"]'
+              master_item:
+                key: 'opnsense.interfaces[{#IFNAME}]'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: 73c729e19a5f4d01855a66553058e14f
+              name: 'Maximum Transmission Unit (MTU) on {#IFDESCR}'
+              type: DEPENDENT
+              key: 'opnsense.interfaces[{#IFNAME}, "mtu"]'
+              delay: '0'
+              history: 7d
+              units: bytes
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["mtu"]'
+              master_item:
+                key: 'opnsense.interfaces[{#IFNAME}]'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: 37f91643eb344a08b0130ca91097dd53
+              name: 'Packets Received on {#IFDESCR}'
+              type: DEPENDENT
+              key: 'opnsense.interfaces[{#IFNAME}, "packets received"]'
+              delay: '0'
+              history: 7d
+              units: Packets
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["packets received"]'
+              master_item:
+                key: 'opnsense.interfaces[{#IFNAME}]'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: 21642b8175dc47378f0ac605e2e900c0
+              name: 'Packets Transmitted on {#IFDESCR}'
+              type: DEPENDENT
+              key: 'opnsense.interfaces[{#IFNAME}, "packets transmitted"]'
+              delay: '0'
+              history: 7d
+              units: Packets
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["packets transmitted"]'
+              master_item:
+                key: 'opnsense.interfaces[{#IFNAME}]'
+              tags:
+                - tag: Application
+                  value: 'Network interfaces'
+            - uuid: 9faa348c3cec4a8e90ac3f3e548701c5
+              name: 'Interface Statistics for {#IFDESCR}'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.interfaces[{#IFNAME}]'
+              delay: '60'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
               tags:
                 - tag: Application
                   value: 'Network interfaces'
