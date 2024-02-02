@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-02T04:59:27Z'
+  date: '2024-02-02T14:41:52Z'
   groups:
     - uuid: 4918b88734c54bd094cff7585b5d71fc
       name: 'Templates/Network Devices'
@@ -692,7 +692,7 @@ zabbix_export:
                 - tag: Application
                   value: Gateways
             - uuid: 657f655fb9204eaf86af048ece7c23dc
-              name: 'Gateway {#GATEWAY} Packet  Loss'
+              name: 'Gateway {#GATEWAY} Packet Loss'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[gw_value,{#GATEWAY},loss]'
               delay: 30s
@@ -839,6 +839,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$["bytes received"]'
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                - type: MULTIPLIER
+                  parameters:
+                    - '8'
               master_item:
                 key: 'opnsense.interfaces[{#IFNAME}]'
               tags:
@@ -855,6 +861,12 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$["bytes transmitted"]'
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                - type: MULTIPLIER
+                  parameters:
+                    - '8'
               master_item:
                 key: 'opnsense.interfaces[{#IFNAME}]'
               tags:
@@ -870,6 +882,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$["packets transmitted"]'
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: 'opnsense.interfaces[{#IFNAME}]'
               tags:
@@ -919,6 +934,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$["packets received"]'
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: 'opnsense.interfaces[{#IFNAME}]'
               tags:
@@ -935,6 +953,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$["packets transmitted"]'
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: 'opnsense.interfaces[{#IFNAME}]'
               tags:
