@@ -123,6 +123,10 @@ function pfz_test(){
 		print_r(legacy_config_get_interfaces(['virtual' => false]));
 		echo $line;
 
+		echo "Interface Statistics:\n";
+		print_r(legacy_interface_stats());
+		echo $line;
+
 		$services = plugins_services();
 		echo "Services: \n";
 		print_r($services);
