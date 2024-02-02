@@ -100,6 +100,9 @@ function pfz_get_carp_status(){
 function pfz_test(){
 		$line = "-------------------\n";
 
+		pfz_interface_discovery();
+		exit();
+
 		$ovpn_servers = pfz_openvpn_get_all_servers();
 		echo "OPENVPN Servers:\n";
 		print_r($ovpn_servers);
@@ -163,49 +166,69 @@ function pfz_test(){
 // Interface Discovery
 // Improved performance
 function pfz_interface_discovery($is_wan=false,$is_cron=false) {
-	$ifdescrs = get_configured_interface_with_descr(true);
-	$ifaces = get_interface_list();
-	$ifcs=array();
-	$if_ret=array();
-	$ifcs = legacy_config_get_interfaces(['virtual' => false]);
-	$ifinfo = $ifcs;
-
+	// $ifdescrs = get_configured_interface_with_descr(true);
+	$config = parse_config();
+	$ifaces = $config['interfaces']; // Keys: Friendly Interface Name
+	$ifaces_details=array();
+	$ifaces_info=array();
+	$ifaces_details = legacy_config_get_interfaces(); // Keys: Friendly Interface Name
+	$ifaces_info = legacy_interfaces_details(); // Keys: HW Interface Name
+	$ppp_types = ['l2tp','pppoe','pptp'];
 	$json_string = '{"data":[';
 
-	foreach ($ifaces as $hwif) {
-		
-		$ifdescr = $hwif["friendly"];
+	foreach ($ifaces as $if_name=>$if_val) {
+		// Ignore virtual interfaces
+		if (array_key_exists('virtual', $if_val)) continue;
+
+		$eval_if = preg_replace('/[0-9]+/', '', $if_val['if']);
+		if (in_array($eval_if, $ppp_types)) {
+			$hwif = get_ppp_parent($if_val['if']);
+		}
+		else {
+			$hwif = get_real_interface($if_val['if']);
+		}
+		$if_details = $ifaces_details[$if_name];
+		$if_info = $ifaces_info[$if_val['if']];
+
 		$has_gw = false;
 		$is_vpn = false;
 		$has_public_ip = false;
 
-		foreach($ifcs as $ifc=>$ifinfo){
-				if ($ifinfo["hwif"] == $hwif){
-						$ifdescr = $ifinfo["description"];
-						if (array_key_exists("gateway",$ifinfo)) $has_gw=true;
-						//	Issue #81 - https://stackoverflow.com/a/13818647/15093007
-						if (filter_var($ifinfo["ipaddr"], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) $has_public_ip=true;
-						if (strpos($ifinfo["if"],"ovpn")!==false) $is_vpn=true;
+		if (array_key_exists("gateway", $if_details)) $has_gw=true;
+		//	Issue #81 - https://stackoverflow.com/a/13818647/15093007
+		$ip_versions = ['ipv4','ipv6'];
+		foreach ($ip_versions as &$ip_ver) {
+			if (!array_key_exists($ip_ver, $if_info)) continue;
+			$list_of_ip_lists = $if_info[$ip_ver];
+			if (count($list_of_ip_lists) >= 1)
+				foreach ($if_info[$ip_ver] as &$ip_addr_list)
+					if (filter_var($ip_addr_list['ipaddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+						$has_public_ip=true;
 						break;
-				}
+					}
 		}
-		if (strlen($ifcs[$ifdescr]["if"]) > 0 && ($is_wan==false) || (($is_wan==true) && (($has_gw==true) || ($has_public_ip==true)) && ($is_vpn==false)) ) {
-			if (strlen($ifcs[$ifdescr]["descr"]) < 1)
-				$descr = $ifcs[$ifdescr]["if"];
+		if (strpos($if_val["if"],"ovpn")!==false) $is_vpn=true;
+		if ( ($is_wan==false) || (($is_wan==true) && (($has_gw==true) || ($has_public_ip==true)) && ($is_vpn==false)) ) {
+			if (strlen($if_details["descr"]) < 1)
+				$out_descr = $if_details["if"];
 			else
-				$descr = $ifcs[$ifdescr]["descr"];
-			$if_ret[]=$hwif;
-			$json_string .= '{"{#IFNAME}":"' . $ifcs[$ifdescr]["if"] . '"';
-			$json_string .= ',"{#IFDESCR}":"' . $descr . '"';
+				$out_descr = $if_details["descr"];
+			$json_string .= '{"{#IFNAME}":"' . $hwif . '"';
+			$json_string .= ',"{#IFDESCR}":"' . $out_descr . '"';
 			$json_string .= '},';
 		}
-	
+		echo "\nName:\n";
+		print($if_name);
+		echo "\nHas GW:\n";
+		print_r($has_gw);
+		echo "\nIS VPN:\n";
+		print_r($is_vpn);
+		echo "\nHas Public IP\n";
+		print_r($has_public_ip);
 	}
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";
 
-	if ($is_cron) return $if_ret;
-	
 	echo $json_string;
 }
 
@@ -1398,7 +1421,7 @@ switch ($mainArgument){
 		pfz_carp_status();
 		break;
 	case "interfaces":
-		echo legacy_interface_stats($argv[2])[$argv[3]];
+		echo json_encode(legacy_interface_stats($argv[2]));
 		break;
 	case "sysversion_cron":
 		pfz_sysversion_cron();
