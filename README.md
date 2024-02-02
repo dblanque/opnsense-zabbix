@@ -45,12 +45,16 @@ UserParameter=opnsense.mbuf.current,netstat -m | grep "mbuf clusters" | cut -f1 
 UserParameter=opnsense.mbuf.cache,netstat -m | grep "mbuf clusters" | cut -f1 -d ' ' | cut -d '/' -f2
 UserParameter=opnsense.mbuf.max,netstat -m | grep "mbuf clusters" | cut -f1 -d ' ' | cut -d '/' -f4
 UserParameter=opnsense.discovery[*],sudo /usr/local/bin/php /root/scripts/opnsense_zbx.php discovery $1
+UserParameter=opnsense.interfaces[*],sudo /usr/local/bin/php /root/scripts/opnsense_zbx.php interfaces $1
 UserParameter=opnsense.value[*],sudo /usr/local/bin/php /root/scripts/opnsense_zbx.php $1 $2 $3
 UserParameter=opnsense.states.max,grep "limit states" /tmp/rules.limits | cut -f4 -d ' '
 UserParameter=opnsense.states.current,sudo /usr/local/bin/php /root/scripts/opnsense_zbx.php states
 ```
 
-You must also enable Root by allowing it in the Zabbix Settings.
+You may also enable Root by allowing it in the Zabbix Settings and add the keys on the *Advanced* tab.
+
+![opnsense_zbx_01](https://github.com/dblanque/opnsense-zabbix/assets/68660667/9fd17b20-3c7c-4a09-a816-9e422137d1c6)
+
 
 ### Enable System Version Cron
 
@@ -69,3 +73,9 @@ Please add the following cronjob to your `/etc/cron.d/opnsense_sysversion`
 ```
 
 Then restart cron with `/etc/rc.d/cron restart`
+
+### Et Voilá
+
+Happy monitoring!
+
+![opnsense_zbx_02](https://github.com/dblanque/opnsense-zabbix/assets/68660667/d801d0b8-2b48-4b0e-b494-a6478123ce3e)
