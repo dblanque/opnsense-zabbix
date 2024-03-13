@@ -47,7 +47,7 @@ function system_get_version(){
 	return execute_script($prog, $arg);
 }
 
-function openvpn_get_active_clients($servers_only=true){
+function openvpn_get_connection_statuses($servers_only=true){
 	$prog = "/usr/local/bin/python3";
 	$script = "/usr/local/opnsense/scripts/openvpn/ovpn_status.py";
 	$json_decode = true;
@@ -108,7 +108,7 @@ function pfz_test(){
 		print_r($ovpn_servers);
 		echo $line;
 
-		$ovpn_clients = openvpn_get_active_clients();
+		$ovpn_clients = openvpn_get_connection_statuses();
 		echo "OPENVPN Clients:\n";
 		print_r($ovpn_clients);
 		echo $line;
@@ -226,11 +226,8 @@ function pfz_interface_discovery($is_wan=false,$is_cron=false) {
 
 // OpenVPN Server Discovery
 function pfz_openvpn_get_all_servers(){
-	 $servers = openvpn_get_remote_access_servers();
-#	Not needed in OPNSense
-#	$sk_servers = openvpn_get_active_servers("p2p");
-#	$servers = array_merge($servers,$sk_servers);
-	 return ($servers);
+	$servers = openvpn_services();
+	return ($servers);
 }
 
 function pfz_openvpn_serverdiscovery() {
@@ -239,10 +236,10 @@ function pfz_openvpn_serverdiscovery() {
 	 $json_string = '{"data":[';
 
 	 foreach ($servers as $server){
-		  $name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $server['description']));
-		  $json_string .= '{"{#SERVER}":"' . $server['vpnid'] . '"';
-		  $json_string .= ',"{#NAME}":"' . $name . '"';
-		  $json_string .= '},';
+		$name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $server['description']));
+		$json_string .= '{"{#SERVER}":"' . $server['id'] . '"';
+		$json_string .= ',"{#NAME}":"' . $name . '"';
+		$json_string .= '},';
 	 }
 
 	 $json_string = rtrim($json_string,",");
@@ -255,7 +252,7 @@ function pfz_openvpn_serverdiscovery() {
 // Get OpenVPN Server Value
 function pfz_openvpn_servervalue($server_id,$valuekey){
 	$servers = pfz_openvpn_get_all_servers();
-	$clients = openvpn_get_active_clients()->$server_id;
+	$clients = openvpn_get_connection_statuses()->$server_id;
 
 	 foreach($servers as $server) {
 		  if($server['vpnid']==$server_id){
@@ -309,7 +306,7 @@ function pfz_openvpn_servervalue($server_id,$valuekey){
 //OpenVPN Server/User-Auth Discovery
 function pfz_openvpn_server_userdiscovery(){
 	$servers = pfz_openvpn_get_all_servers();
-	$all_clients = openvpn_get_active_clients();
+	$all_clients = openvpn_get_connection_statuses();
 
 	$json_string = '{"data":[';
 	
@@ -347,7 +344,7 @@ function pfz_openvpn_server_uservalue($unique_id, $valuekey, $default=""){
 	$user_id = substr($unique_id,$atpos+1);
 	
 	$servers = pfz_openvpn_get_all_servers();
-	$all_clients = openvpn_get_active_clients();
+	$all_clients = openvpn_get_connection_statuses();
 	foreach($servers as $server) {
 		if($server['vpnid']==$server_id) {
 			$server_id=$server['vpnid'];
@@ -370,7 +367,7 @@ function pfz_openvpn_server_uservalue($unique_id, $valuekey, $default=""){
 
 // OpenVPN Client Discovery
 function pfz_openvpn_clientdiscovery() {
-	$all_clients = openvpn_get_active_clients(false);
+	$all_clients = openvpn_get_connection_statuses(false);
 	$json_string = '{"data":[';
 		
 	if (property_exists($all_clients, "client")) {
@@ -405,7 +402,7 @@ function pfz_replacespecialchars($inputstr,$reverse=false){
 }
 
 function pfz_openvpn_clientvalue($client_id, $valuekey, $default="none"){
-	 $clients = openvpn_get_active_clients();
+	 $clients = openvpn_get_connection_statuses();
 	 foreach($clients as $client) {
 		  if($client['vpnid']==$client_id)
 			   $value = $client[$valuekey];
@@ -564,17 +561,14 @@ function pfz_gw_value($gw, $valuekey) {
 
 
 // IPSEC Discovery
-function pfz_ipsec_discovery_ph1(){
-
-	require_once("plugins.d/ipsec.inc");
-	global $config;
-	$config = parse_config();
-	$a_phase1 = &$config['ipsec']['phase1'];
+function pfz_ipsec_discovery(){
+	$strongswan_services = (new \OPNsense\IPsec\Swanctl())->getConfig();
+	$ipsec_services = ipsec_services();
 	
 	$json_string = '{"data":[';
-	
-	foreach ($a_phase1 as $data) {
-		$json_string .= '{"{#IKEID}":"' . $data['ikeid'] . '"';
+
+	foreach ($ipsec_statuses as $ikeid => $data) {
+		$json_string .= '{"{#IKEID}":"' . $ikeid . '"';
 		$json_string .= ',"{#NAME}":"' . $data['descr'] . '"';
 		$json_string .= '},';
 	}	
