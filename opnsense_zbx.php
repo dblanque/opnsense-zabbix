@@ -28,9 +28,10 @@ require_once('plugins.inc.d/openvpn.inc');
 require_once('system.inc');
 require dirname(__FILE__).'/legacy_func.php';
 
+require_once("script/load_phalcon.php");
+use OPNsense\Core\Config;
+
 function get_mvc_config(){
-	require_once("script/load_phalcon.php");
-	use OPNsense\Core\Config;
 	return Config::getInstance()->toArray();
 }
 
