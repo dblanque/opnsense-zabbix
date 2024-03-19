@@ -134,9 +134,9 @@ function opn_test(){
 		echo "Services: \n";
 		print_r($services);
 		echo $line;
-		
+
 		echo "IPsec: \n";
-	
+
 		require_once("plugins.inc.d/ipsec.inc");
 		global $config;
 		$config = parse_config();
@@ -144,18 +144,18 @@ function opn_test(){
 		$status = ipsec_get_status();
 		echo "IPsec Status: \n";
 		print_r($status);
-		
+
 		$a_phase1 = &$config['ipsec']['phase1'];
 		$a_phase2 = &$config['ipsec']['phase2'];
-	
+
 		echo "IPsec Config Phase 1: \n";
 		print_r($a_phase1);
-		
+
 		echo "IPsec Config Phase 2: \n";
 		print_r($a_phase2);
-		
+
 		echo $line;
-		
+
 		//Packages
 		echo "Packages: \n";
 		require_once("plugins.inc");
@@ -276,9 +276,9 @@ function opn_openvpn_servervalue($server_id,$valuekey){
 				}
 		  }
 	 }
-	
+
 	 switch ($valuekey){
-		
+
 		  case "conns":
 			   //Client Connections: is an array so it is sufficient to count elements
 				if (is_array($clients->client_list))
@@ -290,7 +290,7 @@ function opn_openvpn_servervalue($server_id,$valuekey){
 			   break;
 
 		  case "status":
-			
+
 			   $value = opn_valuemap("openvpn.server.status", $value);
 			   break;
 
@@ -309,7 +309,7 @@ function opn_openvpn_server_userdiscovery(){
 	$all_clients = openvpn_get_connection_statuses();
 
 	$json_string = '{"data":[';
-	
+
 	foreach ($servers as $server){
 		$server_id = $server['vpnid'];
 		if ( ($server['mode']=='server_user') || ($server['mode']=='server_tls_user') || ($server['mode']=='server_tls') ) {
@@ -318,7 +318,7 @@ function opn_openvpn_server_userdiscovery(){
 				$name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $server['description']));
 				foreach($clients as $conn) {
 					$common_name = opn_replacespecialchars($conn->common_name);
-					
+
 					$json_string .= '{"{#SERVERID}":"' . $server_id . '"';
 					$json_string .= ',"{#SERVERNAME}":"' . $name . '"';
 					$json_string .= ',"{#UNIQUEID}":"' . $server_id . '+' . $common_name . '"';
@@ -328,21 +328,21 @@ function opn_openvpn_server_userdiscovery(){
 			}
 		}
 	}
-	
+
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";
 
 	echo $json_string;
 }
-	
+
 // Get OpenVPN User Connected Value
 function opn_openvpn_server_uservalue($unique_id, $valuekey, $default=""){
-	
+
 	$unique_id = opn_replacespecialchars($unique_id,true);
 	$atpos=strpos($unique_id,'+');
 	$server_id = substr($unique_id,0,$atpos);
 	$user_id = substr($unique_id,$atpos+1);
-	
+
 	$servers = opn_openvpn_get_all_servers();
 	$all_clients = openvpn_get_connection_statuses();
 	foreach($servers as $server) {
@@ -369,7 +369,7 @@ function opn_openvpn_server_uservalue($unique_id, $valuekey, $default=""){
 function opn_openvpn_clientdiscovery() {
 	$all_clients = openvpn_get_connection_statuses(false);
 	$json_string = '{"data":[';
-		
+
 	if (property_exists($all_clients, "client")) {
 		$all_clients = $all_clients->client;
 		foreach ($all_clients as $client){
@@ -390,14 +390,14 @@ function opn_replacespecialchars($inputstr,$reverse=false){
 	 $specialchars = ",',\",`,*,?,[,],{,},~,$,!,&,;,(,),<,>,|,#,@,0x0a";
 	 $specialchars = explode(",",$specialchars);	
 	 $resultstr = $inputstr;
-	
+
 	 for ($n=0;$n<count($specialchars);$n++){
 	 	if ($reverse==false)
 	 		$resultstr = str_replace($specialchars[$n],'%%' . $n . '%',$resultstr);
 	 	else
 	 		$resultstr = str_replace('%%' . $n . '%',$specialchars[$n],$resultstr);
 	 }	
-	
+
 	 return ($resultstr);
 }
 
@@ -409,7 +409,7 @@ function opn_openvpn_clientvalue($client_id, $valuekey, $default="none"){
 	 }
 
 	 switch ($valuekey){
-			
+
 		  case "status":
 			   $value = opn_valuemap("openvpn.client.status", $value);
 			   break;
@@ -429,7 +429,7 @@ function opn_services_discovery(){
 
 	 foreach ($services as $service){
 		  if (!empty($service['name'])) {
-			
+
 			   $status = service_status($service);
 			   if ($status="") $status = 0;
 
@@ -438,7 +438,7 @@ function opn_services_discovery(){
 			   if (!empty($service['id'])) $id = "." . $service["id"];
 			   //zone for Captive Portal
 			   if (!empty($service['zone'])) $id = "." . $service["zone"];
-							
+
 			   $json_string .= '{"{#SERVICE}":"' . str_replace(" ", "__", $service['name']) . $id . '"';
 			   $json_string .= ',"{#DESCRIPTION}":"' . $service['description'] . '"';
 			   $json_string .= '},';
@@ -446,7 +446,7 @@ function opn_services_discovery(){
 	 }
 	 $json_string = rtrim($json_string,",");
 	 $json_string .= "]}";
-	
+
 	 echo $json_string;
 
 }
@@ -457,12 +457,12 @@ function opn_services_discovery(){
 function opn_service_value($name,$value){
 	 $services = plugins_services();
 	 $name = str_replace("__"," ",$name);
-		
+
 	 //List of service which are stopped on CARP Slave.
 	 //For now this is the best way i found for filtering out the triggers
 	 //Waiting for a way in Zabbix to use Global Regexp in triggers with items discovery
 	 $stopped_on_carp_slave = array("haproxy","radvd","openvpn.","openvpn","avahi");
-	
+
 	 foreach ($services as $service){
 		  $namecfr = $service["name"];
 		  $carpcfr = $service["name"];
@@ -481,7 +481,7 @@ function opn_service_value($name,$value){
 
 		  if ($namecfr == $name){
 			   switch ($value) {
-			
+
 					case "status":
 						 $status = service_status($service);
 						 if ($status=="") $status = 0;
@@ -538,7 +538,7 @@ function opn_gw_discovery() {
 	 }
 	 $json_string = rtrim($json_string,",");
 	 $json_string .= "]}";
-	
+
 	 echo $json_string;
 }
 
@@ -551,7 +551,7 @@ function opn_gw_value($gw, $valuekey) {
 			   //Issue #70: Gateway Forced Down
 			   if ($gws[$gw]["substatus"]<>"none")
 					$value = $gws[$gw]["substatus"];
-			
+
 			   $value = opn_valuemap("gateway.status", $value);
 		  }
 		  echo $value;
@@ -574,9 +574,9 @@ function opn_ipsec_discovery(){
 
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";     	
-	
+
 	echo $json_string;
-	
+
 }
 
 function opn_ipsec_ph1($ikeid,$valuekey){	
@@ -612,15 +612,15 @@ function opn_ipsec_ph1($ikeid,$valuekey){
 }
 
 function opn_ipsec_discovery_ph2(){
-	
+
 	require_once("ipsec.inc");
-	
+
 	global $config;
 	$config = parse_config();
 	$a_phase2 = &$config['ipsec']['phase2'];
-	
+
 	$json_string = '{"data":[';
-	
+
 	foreach ($a_phase2 as $data) {
 		$json_string .= '{"{#IKEID}":"' . $data['ikeid'] . '"';
 		$json_string .= ',"{#NAME}":"' .  $data['descr'] . '"';
@@ -632,9 +632,9 @@ function opn_ipsec_discovery_ph2(){
 
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";     	
-	
+
 	echo $json_string;
-	
+
 }
 
 function opn_ipsec_ph2($uniqid, $valuekey){
@@ -642,9 +642,9 @@ function opn_ipsec_ph2($uniqid, $valuekey){
 	global $config;
 	$config = parse_config();
 	$a_phase2 = &$config['ipsec']['phase2'];
-	
+
 	$valuecfr = explode(".",$valuekey);
-		
+
 	switch ($valuecfr[0]) {
 		case 'status':
 			$idarr = explode(".", $uniqid);
@@ -655,7 +655,7 @@ function opn_ipsec_ph2($uniqid, $valuekey){
 		case 'disabled':
 			$value = "0";
 	}							
-	
+
 	foreach ($a_phase2 as $data) {
 		if ($data['uniqid'] == $uniqid) {
 			if(array_key_exists($valuekey,$data)) {
@@ -671,11 +671,11 @@ function opn_ipsec_ph2($uniqid, $valuekey){
 }
 
 function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
-		
+
 	require_once("ipsec.inc");
 	global $config;
 	$config = parse_config();
-	
+
 	$a_phase1 = &$config['ipsec']['phase1'];
 	$conmap = array();
 	foreach ($a_phase1 as $ph1ent) {
@@ -688,19 +688,19 @@ function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
 		} else{
 			$cname = ipsec_conid($ph1ent);
 		}
-		
+
 		$conmap[$cname] = $ph1ent['ikeid'];
 	}
 
 	$status = ipsec_get_status();
 	$ipsecconnected = array();
-	
+
 	$carp_status = opn_carp_status(false);
-	
+
 	//Phase-Status match borrowed from status_ipsec.php	
 	if (is_array($status)) {		
 		foreach ($status as $l_ikeid=>$ikesa) {
-			
+
 			if (isset($ikesa['con-id'])) {
 				$con_id = substr($ikesa['con-id'], 3);
 			} else {
@@ -736,12 +736,12 @@ function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
 				} else {
 					$tmp_value = $ikesa[$valuekey];
 				}
-								
+
 				break;
 			}			
 		}	
 	}
-	
+
 	switch($valuekey) {
 					case 'state':
 						$value = opn_valuemap('ipsec.state', strtolower($tmp_value));
@@ -751,7 +751,7 @@ function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
 						$value = $tmp_value;
 						break;
 	}
-	
+
 	return $value;
 }
 
@@ -814,7 +814,7 @@ function opn_carp_status($echo = true){
 			if ($echo == true) echo $ret;
 			return $ret;
 		}
-				
+
 		$status_changed = false;
 		$prev_status = "";
 		foreach ($config['virtualip']['vip'] as $carp) {
@@ -860,7 +860,7 @@ function opn_remove_duplicate($array, $field) {
 function opn_dhcp_get($valuekey) {
 
 	require_once("config.inc");
-	
+
 	$leasesfile = "{$g['dhcpd_chroot_path']}/var/db/dhcpd.leases";
 
 	$awk = "/usr/bin/awk";
@@ -876,7 +876,7 @@ function opn_dhcp_get($valuekey) {
 
 	$leases = [];
 	$pools = [];
-	
+
 	$i = 0;
 	$l = 0;
 	$p = 0;
@@ -1025,9 +1025,9 @@ function opn_dhcpfailover_discovery(){
 	//System functions regarding DHCP Leases will be available in the upcoming release of OPNSense, so let's wait
 	require_once("system.inc");
 	$leases = system_get_dhcpleases();
-	
+
 	$json_string = '{"data":[';
-	
+
 	if (count($leases['failover']) > 0){
 		foreach ($leases['failover'] as $data){
 			   $json_string .= '{"{#FAILOVER_GROUP}":"' . str_replace(" ", "__", $data['name']) . '"';
@@ -1036,7 +1036,7 @@ function opn_dhcpfailover_discovery(){
 
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";     	
-	
+
 	echo $json_string;
 }
 
@@ -1181,14 +1181,14 @@ function opn_get_smart_status(){
 								break;
 				}
 	}
-	
+
 	echo $status;
 }
 
 // Certificats validity date
 function opn_get_cert_date($valuekey){
 	global $config;
-	
+
 	// Contains a list of refs that were revoked and should not be considered
 	$revoked_cert_refs = [];
 	foreach ($config["crl"] as $crl) {
@@ -1196,7 +1196,7 @@ function opn_get_cert_date($valuekey){
 			$revoked_cert_refs[] = $revoked_cert["refid"];
 		}
 	}
-	
+
 	$value = 0;
 		foreach (array("cert", "ca") as $cert_type) {
 				switch ($valuekey){
@@ -1244,7 +1244,7 @@ function opn_valuemap($valuename, $value, $default="0"){
 						 "waiting" => "4",
 						 "server_user_listening" => "5");
 		  break;
-		
+
 		  case "openvpn.client.status":
 					$valuemap = array(
 						 "up" => "1",
@@ -1262,7 +1262,7 @@ function opn_valuemap($valuename, $value, $default="0"){
 						 "server_user" => "4",
 						 "server_tls_user" => "5");
 		  break;
-		
+
 		  case "gateway.status":
 					$valuemap = array(
 						 "online" => "0",
@@ -1273,34 +1273,34 @@ function opn_valuemap($valuename, $value, $default="0"){
 						 "force_down" => "4",
 						 "down" => "5");
 		  break;
-		
+
 		  case "ipsec.iketype":
 		  			$valuemap = array (
 		  				"auto" => 0,
 		  				"ikev1" => 1,
 		  				"ikev2" => 2);
 		  break;
-		
+
 		  case "ipsec.mode":
 		  			$valuemap = array (
 		  				"main" => 0,
 		  				"aggressive" => 1);
 		  break;
-		
+
 		  case "ipsec.protocol":
 		  			$valuemap = array (
 		  				"both" => 0,
 		  				"inet" => 1,
 		  				"inet6" => 2);
 		  break;
-		
+
 		  case "ipsec_ph2.mode":
 		  			$valuemap = array (
 		  				"transport" => 0,
 		  				"tunnel" => 1,
 		  				"tunnel6" => 2);
 		  break;
-		
+
 		  case "ipsec_ph2.protocol":
 		  			$valuemap = array (
 		  				"esp" => 1,
