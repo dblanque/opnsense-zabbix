@@ -559,43 +559,80 @@ function opn_gw_value($gw, $valuekey) {
 		}
 }
 
-// IPSEC Discovery for Strongswan
+// Accumulate all types (Legacy PH1, PH2, SWAN)
 function opn_ipsec_discovery(){
+	$swanconns = opn_ipsec_discovery_swan(true);
+	$ph1_conns = opn_ipsec_discovery_ph1(true);
+	$ph2_conns = opn_ipsec_discovery_ph2(true);
+	$connections = array_merge($swanconns, $ph1_conns, $ph2_conns);
+	print_r($connections);
+	return $connections;
+}
+
+// IPSEC Discovery for Strongswan
+function opn_ipsec_discovery_swan($as_array=false){
 	$swanctl = (new \OPNsense\IPsec\Swanctl());
 	$swanconns = $swanctl->getNodes()["Connections"];
-
+	$connections = [];
 	$json_string = '{"data":[';
 
 	foreach ($swanconns["Connection"] as $ikeid => $data) {
-		$json_string .= '{"{#IKEID}":"' . $ikeid . '"';
-		$json_string .= ',"{#NAME}":"' . $data['description'] . '"';
-		$json_string .= '},';
-	}	
+		if (!array_key_exists("description", $data))
+			$description = "Strongswan IPSec Tunnel";
+		else
+			$description = $data["description"];
+
+		if ($as_array === true) {
+			$c = array(
+				"ikeid"	=>	$ikeid,
+				"name"	=>	$data["description"],
+				"type"	=>	"swan",
+			);
+			array_push($connections, $c);
+		} else {
+			$json_string .= '{"{#IKEID}":"' . $ikeid . '"';
+			$json_string .= ',"{#NAME}":"' . $data['description'] . '"';
+			$json_string .= '},';
+		}
+	}
+
+	if ($as_array === true) return $connections;
 
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";			
-
 	echo $json_string;
 }
 
-function opn_ipsec_discovery_ph1(){
+function opn_ipsec_discovery_ph1($as_array=false){
 	require_once("plugins.inc.d/ipsec.inc");
 
 	global $config;
 	$config = parse_config();
 	$a_phase1 = &$config['ipsec']['phase1'];
-
+	$connections = [];
 	$json_string = '{"data":[';
 
 	foreach ($a_phase1 as $data) {
 		if (!array_key_exists("descr", $data))
-			$description = "Unnamed IPSEC Phase 1";
+			$description = "Legacy IPSec Phase 1 Tunnel";
 		else
 			$description = $data['descr'];
-		$json_string .= '{"{#IKEID}":"' . $data['ikeid'] . '"';
-		$json_string .= ',"{#NAME}":"' . $description . '"';
-		$json_string .= '},';
+
+		if ($as_array === true) {
+			$c = array(
+				"ikeid"	=>	$data['ikeid'],
+				"name"	=>	$description,
+				"type"	=>	"legacy_ph1",
+			);
+			array_push($connections, $c);
+		} else {
+			$json_string .= '{"{#IKEID}":"' . $data['ikeid'] . '"';
+			$json_string .= ',"{#NAME}":"' . $description . '"';
+			$json_string .= '},';
+		}
 	}
+
+	if ($as_array === true) return $connections;
 
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";			
@@ -606,7 +643,6 @@ function opn_ipsec_discovery_ph1(){
 function opn_ipsec_ph1($ikeid,$valuekey){	
 	// Get Value from IPsec Phase 1 Configuration
 	// If Getting "disabled" value only check item presence in config array
-
 	require_once("plugins.inc.d/ipsec.inc");
 	global $config;
 	$config = parse_config();
@@ -635,25 +671,42 @@ function opn_ipsec_ph1($ikeid,$valuekey){
 	echo $value;
 }
 
-function opn_ipsec_discovery_ph2(){
-
+function opn_ipsec_discovery_ph2($as_array=false){
 	require_once("plugins.inc.d/ipsec.inc");
 
 	global $config;
 	$config = parse_config();
 	$a_phase2 = &$config['ipsec']['phase2'];
-
+	$connections = [];
 	$json_string = '{"data":[';
 
 	foreach ($a_phase2 as $data) {
-		$json_string .= '{"{#IKEID}":"' . $data['ikeid'] . '"';
-		$json_string .= ',"{#NAME}":"' .  $data['descr'] . '"';
-		$json_string .= ',"{#UNIQID}":"' .  $data['uniqid'] . '"';
-		$json_string .= ',"{#REQID}":"' .  $data['reqid'] . '"';
-		$json_string .= ',"{#EXTID}":"' .  $data['ikeid'] . '.' . $data['reqid'] . '"';
-		$json_string .= '},';
+		if (!array_key_exists("descr", $data))
+			$description = "Legacy IPSec Phase 2 Tunnel";
+		else
+			$description = $data['descr'];
+		
+		if ($as_array === true) {
+			$c = array(
+				"ikeid"	=>	$data['ikeid'],
+				"name"	=>	$description,
+				"uniqid"=>	$data['uniqid'],
+				"reqid"=>	$data['reqid'],
+				"extid"=>	$data['ikeid'] . '.' . $data['reqid'],
+				"type"	=>	"legacy_ph2",
+			);
+			array_push($connections, $c);
+		} else {
+			$json_string .= '{"{#IKEID}":"' . $data['ikeid'] . '"';
+			$json_string .= ',"{#NAME}":"' .  $data['descr'] . '"';
+			$json_string .= ',"{#UNIQID}":"' .  $data['uniqid'] . '"';
+			$json_string .= ',"{#REQID}":"' .  $data['reqid'] . '"';
+			$json_string .= ',"{#EXTID}":"' .  $data['ikeid'] . '.' . $data['reqid'] . '"';
+			$json_string .= '},';
+		}
 	}	
 
+	if ($as_array === true) return $connections;
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";			
 
@@ -1377,6 +1430,9 @@ switch (strtolower($section)){
 		break;
 	case "ipsec_ph2":
 		opn_ipsec_discovery_ph2();
+		break;
+	case "ipsec_swan":
+		opn_ipsec_discovery_swan();
 		break;
 	case "dhcpfailover":
 		opn_dhcpfailover_discovery();
