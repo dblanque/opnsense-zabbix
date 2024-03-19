@@ -820,13 +820,13 @@ function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
 	}
 
 	switch($valuekey) {
-					case 'state':
-						$value = opn_valuemap('ipsec.state', strtolower($tmp_value));
-						if ($carp_status!=0) $value = $value + (10 * ($carp_status-1));						
-						break;
-					default:
-						$value = $tmp_value;
-						break;
+		case 'state':
+			$value = opn_valuemap('ipsec.state', strtolower($tmp_value));
+			if ($carp_status!=0) $value = $value + (10 * ($carp_status-1));						
+			break;
+		default:
+			$value = $tmp_value;
+			break;
 	}
 
 	return $value;
@@ -1499,6 +1499,9 @@ switch ($mainArgument){
 		break;
 	case "ipsec_ph2":
 		opn_ipsec_ph2($argv[2],$argv[3]);
+		break;
+	case "ipsec_swan":
+		opn_ipsec_swan($argv[2],$argv[3]);
 		break;
 	case "dhcp":
 		opn_dhcp($argv[2],$argv[3]);
