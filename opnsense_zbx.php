@@ -24,9 +24,6 @@ require_once('interfaces.inc');
 // For OpenVPN Discovery
 require_once('plugins.inc.d/openvpn.inc');
 
-// For IPSec
-require_once("plugins.inc.d/ipsec.inc");
-
 // For System
 require_once('system.inc');
 require dirname(__FILE__).'/legacy_func.php';
@@ -136,7 +133,7 @@ function opn_test(){
 		echo $line;
 
 		echo "IPsec: \n";
-
+		require_once("plugins.inc.d/ipsec.inc");
 		global $config;
 		$config = parse_config();
 		$a_phase2 = &$config['ipsec']['phase2'];
@@ -577,11 +574,35 @@ function opn_ipsec_discovery(){
 
 }
 
+function opn_ipsec_discovery_ph1(){
+	require_once("plugins.inc.d/ipsec.inc");
+
+	global $config;
+	$config = parse_config();
+	$a_phase1 = &$config['ipsec']['phase1'];
+
+	$json_string = '{"data":[';
+
+	foreach ($a_phase1 as $data) {
+		$json_string .= '{"{#IKEID}":"' . $data['ikeid'] . '"';
+		$json_string .= ',"{#NAME}":"' .  $data['descr'] . '"';
+		$json_string .= ',"{#UNIQID}":"' .  $data['uniqid'] . '"';
+		$json_string .= ',"{#REQID}":"' .  $data['reqid'] . '"';
+		$json_string .= ',"{#EXTID}":"' .  $data['ikeid'] . '.' . $data['reqid'] . '"';
+		$json_string .= '},';
+	}	
+
+	$json_string = rtrim($json_string,",");
+	$json_string .= "]}";			
+
+	echo $json_string;
+}
+
 function opn_ipsec_ph1($ikeid,$valuekey){	
 	// Get Value from IPsec Phase 1 Configuration
 	// If Getting "disabled" value only check item presence in config array
 
-	require_once("ipsec.inc");
+	require_once("plugins.inc.d/ipsec.inc");
 	global $config;
 	$config = parse_config();
 	$a_phase1 = &$config['ipsec']['phase1'];
@@ -611,7 +632,7 @@ function opn_ipsec_ph1($ikeid,$valuekey){
 
 function opn_ipsec_discovery_ph2(){
 
-	require_once("ipsec.inc");
+	require_once("plugins.inc.d/ipsec.inc");
 
 	global $config;
 	$config = parse_config();
@@ -632,11 +653,10 @@ function opn_ipsec_discovery_ph2(){
 	$json_string .= "]}";			
 
 	echo $json_string;
-
 }
 
 function opn_ipsec_ph2($uniqid, $valuekey){
-	require_once("ipsec.inc");
+	require_once("plugins.inc.d/ipsec.inc");
 	global $config;
 	$config = parse_config();
 	$a_phase2 = &$config['ipsec']['phase2'];
@@ -670,7 +690,7 @@ function opn_ipsec_ph2($uniqid, $valuekey){
 
 function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
 
-	require_once("ipsec.inc");
+	require_once("plugins.inc.d/ipsec.inc");
 	global $config;
 	$config = parse_config();
 
