@@ -24,6 +24,9 @@ require_once('interfaces.inc');
 // For OpenVPN Discovery
 require_once('plugins.inc.d/openvpn.inc');
 
+// For IPSec
+require_once("plugins.inc.d/ipsec.inc");
+
 // For System
 require_once('system.inc');
 require dirname(__FILE__).'/legacy_func.php';
@@ -100,9 +103,6 @@ function opn_get_carp_status(){
 function opn_test(){
 		$line = "-------------------\n";
 
-		opn_interface_discovery();
-		exit();
-
 		$ovpn_servers = opn_openvpn_get_all_servers();
 		echo "OPENVPN Servers:\n";
 		print_r($ovpn_servers);
@@ -137,7 +137,6 @@ function opn_test(){
 
 		echo "IPsec: \n";
 
-		require_once("plugins.inc.d/ipsec.inc");
 		global $config;
 		$config = parse_config();
 		$a_phase2 = &$config['ipsec']['phase2'];
@@ -164,7 +163,6 @@ function opn_test(){
 }
 
 // Interface Discovery
-// Improved performance
 function opn_interface_discovery($is_wan=false,$is_cron=false) {
 	// $ifdescrs = get_configured_interface_with_descr(true);
 	$config = parse_config();
