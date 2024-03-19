@@ -28,6 +28,12 @@ require_once('plugins.inc.d/openvpn.inc');
 require_once('system.inc');
 require dirname(__FILE__).'/legacy_func.php';
 
+function get_mvc_config(){
+	require_once("script/load_phalcon.php");
+	use OPNsense\Core\Config;
+	return Config::getInstance()->toArray();
+}
+
 function execute_script($prog, $args, $json_decode=false){
 	$ex = $prog;
 	if (is_array($args))
@@ -553,17 +559,16 @@ function opn_gw_value($gw, $valuekey) {
 		}
 }
 
-
-// IPSEC Discovery
+// IPSEC Discovery for Strongswan
 function opn_ipsec_discovery(){
-	$strongswan_services = (new \OPNsense\IPsec\Swanctl())->getConfig();
-	$ipsec_services = ipsec_services();
+	$swanctl = (new \OPNsense\IPsec\Swanctl());
+	$swanconns = $swanctl->getNodes()["Connections"];
 
 	$json_string = '{"data":[';
 
-	foreach ($ipsec_statuses as $ikeid => $data) {
+	foreach ($swanconns["Connection"] as $ikeid => $data) {
 		$json_string .= '{"{#IKEID}":"' . $ikeid . '"';
-		$json_string .= ',"{#NAME}":"' . $data['descr'] . '"';
+		$json_string .= ',"{#NAME}":"' . $data['description'] . '"';
 		$json_string .= '},';
 	}	
 
@@ -571,7 +576,6 @@ function opn_ipsec_discovery(){
 	$json_string .= "]}";			
 
 	echo $json_string;
-
 }
 
 function opn_ipsec_discovery_ph1(){
@@ -584,13 +588,14 @@ function opn_ipsec_discovery_ph1(){
 	$json_string = '{"data":[';
 
 	foreach ($a_phase1 as $data) {
+		if (!array_key_exists("descr", $data))
+			$description = "Unnamed IPSEC Phase 1";
+		else
+			$description = $data['descr'];
 		$json_string .= '{"{#IKEID}":"' . $data['ikeid'] . '"';
-		$json_string .= ',"{#NAME}":"' .  $data['descr'] . '"';
-		$json_string .= ',"{#UNIQID}":"' .  $data['uniqid'] . '"';
-		$json_string .= ',"{#REQID}":"' .  $data['reqid'] . '"';
-		$json_string .= ',"{#EXTID}":"' .  $data['ikeid'] . '.' . $data['reqid'] . '"';
+		$json_string .= ',"{#NAME}":"' . $description . '"';
 		$json_string .= '},';
-	}	
+	}
 
 	$json_string = rtrim($json_string,",");
 	$json_string .= "]}";			
