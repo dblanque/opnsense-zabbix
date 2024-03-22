@@ -920,7 +920,7 @@ function opn_carp_status($echo = true){
 	return $ret;
 }
 
-// DHCP Checks (copy of status_dhcp_leases.php, waiting for OPNSense 2.5)
+// DHCP Checks (copy of status_dhcp_leases.php)
 function opn_remove_duplicate($array, $field) {
 	foreach ($array as $sub) {
 		$cmp[] = $sub[$field];
