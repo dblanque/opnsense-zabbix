@@ -142,7 +142,7 @@ function opn_test(){
 		echo "IPsec: \n";
 		require_once("plugins.inc.d/ipsec.inc");
 		global $config;
-		$config = parse_config();
+		$config = get_mvc_config();
 		$a_phase2 = &$config['ipsec']['phase2'];
 		$status = ipsec_get_status();
 		echo "IPsec Status: \n";
@@ -169,7 +169,7 @@ function opn_test(){
 // Interface Discovery
 function opn_interface_discovery($is_wan=false,$is_cron=false) {
 	// $ifdescrs = get_configured_interface_with_descr(true);
-	$config = parse_config();
+	$config = get_mvc_config();
 	$ifaces = $config['interfaces']; // Keys: Friendly Interface Name
 	$ifaces_details=array();
 	$ifaces_info=array();
@@ -517,7 +517,6 @@ function opn_service_value($name,$value){
 	echo 0;
 }
 
-
 //Gateway Discovery
 function opn_gw_rawstatus() {
 		// Return a Raw Gateway Status, useful for action Scripts (e.g. Update Cloudflare DNS config)
@@ -528,7 +527,6 @@ function opn_gw_rawstatus() {
 		}
 		echo rtrim($gw_string,",");
 }
-
 
 function opn_gw_discovery() {
 		$gws = return_gateways_status();
@@ -543,7 +541,6 @@ function opn_gw_discovery() {
 
 		echo $json_string;
 }
-
 
 function opn_gw_value($gw, $valuekey) {
 		$gws = return_gateways_status();
@@ -561,10 +558,19 @@ function opn_gw_value($gw, $valuekey) {
 }
 
 // Accumulate all types (Legacy PH1, PH2, SWAN)
-function opn_ipsec_discovery(){
-	$swanconns = opn_ipsec_discovery_swan(true);
-	$ph1_conns = opn_ipsec_discovery_ph1(true);
-	$ph2_conns = opn_ipsec_discovery_ph2(true);
+function opn_ipsec_discovery($ipsec_types=array("all")){
+	$swanconns = array();
+	$ph1_conns = array();
+	$ph2_conns = array();
+	if (in_array("all", $ipsec_types) || in_array("swan", $ipsec_types)) {
+		$swanconns = opn_ipsec_discovery_swan(true);
+	}
+	if (in_array("all", $ipsec_types) || in_array("legacy_ph1", $ipsec_types)) {
+		$ph1_conns = opn_ipsec_discovery_ph1(true);
+	}
+	if (in_array("all", $ipsec_types) || in_array("legacy_ph1", $ipsec_types)) {
+		$ph2_conns = opn_ipsec_discovery_ph2(true);
+	}
 	$connections = array_merge($swanconns, $ph1_conns, $ph2_conns);
 	print_r($connections);
 	return $connections;
@@ -608,7 +614,7 @@ function opn_ipsec_discovery_ph1($as_array=false){
 	require_once("plugins.inc.d/ipsec.inc");
 
 	global $config;
-	$config = parse_config();
+	$config = get_mvc_config();
 	$a_phase1 = &$config['ipsec']['phase1'];
 	$connections = [];
 	$json_string = '{"data":[';
@@ -646,7 +652,7 @@ function opn_ipsec_ph1($ikeid,$valuekey){
 	// If Getting "disabled" value only check item presence in config array
 	require_once("plugins.inc.d/ipsec.inc");
 	global $config;
-	$config = parse_config();
+	$config = get_mvc_config();
 	$a_phase1 = &$config['ipsec']['phase1'];
 
 	$value = "";
@@ -676,7 +682,7 @@ function opn_ipsec_discovery_ph2($as_array=false){
 	require_once("plugins.inc.d/ipsec.inc");
 
 	global $config;
-	$config = parse_config();
+	$config = get_mvc_config();
 	$a_phase2 = &$config['ipsec']['phase2'];
 	$connections = [];
 	$json_string = '{"data":[';
@@ -717,7 +723,7 @@ function opn_ipsec_discovery_ph2($as_array=false){
 function opn_ipsec_ph2($uniqid, $valuekey){
 	require_once("plugins.inc.d/ipsec.inc");
 	global $config;
-	$config = parse_config();
+	$config = get_mvc_config();
 	$a_phase2 = &$config['ipsec']['phase2'];
 
 	$valuecfr = explode(".",$valuekey);
@@ -747,25 +753,15 @@ function opn_ipsec_ph2($uniqid, $valuekey){
 	echo $value;
 }
 
-function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
-
+function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state',$ipsec_type="swan"){
 	require_once("plugins.inc.d/ipsec.inc");
 	global $config;
-	$config = parse_config();
+	$config = get_mvc_config();
 
 	$a_phase1 = &$config['ipsec']['phase1'];
 	$conmap = array();
 	foreach ($a_phase1 as $ph1ent) {
-		if (function_exists('get_ipsecifnum')) {
-			if (get_ipsecifnum($ph1ent['ikeid'], 0)) {
-				$cname = "con" . get_ipsecifnum($ph1ent['ikeid'], 0);
-			} else {
-				$cname = "con{$ph1ent['ikeid']}00000";
-			}
-		} else{
-			$cname = ipsec_conid($ph1ent);
-		}
-
+		$cname = "con".$ph1ent['ikeid'];
 		$conmap[$cname] = $ph1ent['ikeid'];
 	}
 
@@ -867,7 +863,7 @@ function opn_get_temperature($sensorid){
 
 function opn_carp_status($echo = true){
 	//Detect CARP Status
-	$config = parse_config();
+	$config = get_mvc_config();
 	$ret = 0;
 	$status = opn_get_carp_status();
 	$carp_detected_problems = get_single_sysctl("net.inet.carp.demotion");
