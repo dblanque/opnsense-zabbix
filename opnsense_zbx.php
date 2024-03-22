@@ -877,8 +877,10 @@ function opn_carp_status($echo = true){
 	$status = opn_get_carp_status();
 	$carp_detected_problems = get_single_sysctl("net.inet.carp.demotion");
 
-	if ($status->status_msg == "Could not locate any defined CARP interfaces.")
-	return $status_return;
+	if ($status->status_msg == "Could not locate any defined CARP interfaces."){
+		if ($echo == true) echo $ret;
+		return $status_return;
+	}
 
 	//CARP is disabled
 	$ret = 0;
@@ -1483,7 +1485,7 @@ switch ($mainArgument){
 		opn_service_value($argv[2],$argv[3]);
 		break;
 	case "carp_status":
-		opn_carp_status();
+		opn_carp_status(true);
 		break;
 	case "interfaces":
 		echo json_encode(legacy_interface_stats($argv[2]));
