@@ -873,17 +873,14 @@ function opn_get_temperature($sensorid){
 function opn_carp_status($echo = true){
 	//Detect CARP Status
 	$config = parse_config();
-	$status_return = 0;
+	$ret = 0;
 	$status = opn_get_carp_status();
 	$carp_detected_problems = get_single_sysctl("net.inet.carp.demotion");
 
 	if ($status->status_msg == "Could not locate any defined CARP interfaces."){
 		if ($echo == true) echo $ret;
-		return $status_return;
+		return $ret;
 	}
-
-	//CARP is disabled
-	$ret = 0;
 
 	if ($status != 0) { //CARP is enabled
 
@@ -1485,7 +1482,7 @@ switch ($mainArgument){
 		opn_service_value($argv[2],$argv[3]);
 		break;
 	case "carp_status":
-		opn_carp_status(true);
+		opn_carp_status();
 		break;
 	case "interfaces":
 		echo json_encode(legacy_interface_stats($argv[2]));
