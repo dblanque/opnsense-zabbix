@@ -834,8 +834,6 @@ function opn_ipsec_status($ikeid,$reqid=-1,$valuekey='state'){
 
 // Temperature sensors Discovery
 function opn_temperature_sensors_discovery(){
-
-
 	$json_string = '{"data":[';
 	$sensors = [];
 	exec("sysctl -a | grep temperature | cut -d ':' -f 1", $sensors, $code);
@@ -858,7 +856,6 @@ function opn_temperature_sensors_discovery(){
 
 // Temperature sensor get value
 function opn_get_temperature($sensorid){
-
 	exec("sysctl '$sensorid' | cut -d ':' -f 2", $value, $code);
 	if ($code != 0 or count($value)!=1) {
 		echo "";
@@ -866,9 +863,7 @@ function opn_get_temperature($sensorid){
 	} else {
 		echo trim($value[0]);
 	}
-
 }
-
 
 function opn_carp_status($echo = true){
 	//Detect CARP Status
