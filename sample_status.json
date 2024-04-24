@@ -1,0 +1,127 @@
+{
+	"e87510c6-92c7-4b73-b835-278b7efb409e": {
+		"local-addrs": "10.10.10.193",
+		"remote-addrs": "10.10.10.194",
+		"children": {
+			"52579354-fa25-4470-9a3a-75520ca52d43": {
+				"mode": "TUNNEL",
+				"rekey_time": "3600",
+				"rekey_bytes": "0",
+				"rekey_packets": "0",
+				"dpd_action": "none",
+				"close_action": "none",
+				"local-ts": [
+					"0.0.0.0\/0"
+				],
+				"remote-ts": [
+					"0.0.0.0\/0"
+				]
+			}
+		},
+		"local-id": "test-opnsense-01",
+		"remote-id": "test-opnsense-02",
+		"version": "IKEv1\/2",
+		"sas": [
+			{
+				"uniqueid": "1",
+				"version": "2",
+				"state": "ESTABLISHED",
+				"local-host": "10.10.10.193",
+				"local-port": "4500",
+				"local-id": "test-opnsense-01",
+				"remote-host": "10.10.10.194",
+				"remote-port": "4500",
+				"remote-id": "test-opnsense-02",
+				"initiator": "yes",
+				"initiator-spi": "743499c5a9d50e4e",
+				"responder-spi": "d603ca8622a803b4",
+				"encr-alg": "AES_CBC",
+				"encr-keysize": "128",
+				"integ-alg": "HMAC_SHA2_256_128",
+				"prf-alg": "PRF_HMAC_SHA2_256",
+				"dh-group": "ECP_256",
+				"established": "247",
+				"rekey-time": "12760",
+				"child-sas": {
+					"52579354-fa25-4470-9a3a-75520ca52d43-1": {
+						"name": "52579354-fa25-4470-9a3a-75520ca52d43",
+						"uniqueid": "1",
+						"reqid": "1",
+						"state": "INSTALLED",
+						"mode": "TUNNEL",
+						"protocol": "ESP",
+						"spi-in": "c501ebcb",
+						"spi-out": "c2a69c58",
+						"encr-alg": "AES_CBC",
+						"encr-keysize": "128",
+						"integ-alg": "HMAC_SHA2_256_128",
+						"bytes-in": "0",
+						"packets-in": "0",
+						"bytes-out": "0",
+						"packets-out": "0",
+						"rekey-time": "3012",
+						"life-time": "3713",
+						"install-time": "251",
+						"local-ts": [
+							"0.0.0.0\/0"
+						],
+						"remote-ts": [
+							"0.0.0.0\/0"
+						]
+					}
+				}
+			},
+			{
+				"uniqueid": "2",
+				"version": "2",
+				"state": "ESTABLISHED",
+				"local-host": "10.10.10.193",
+				"local-port": "4500",
+				"local-id": "test-opnsense-01",
+				"remote-host": "10.10.10.194",
+				"remote-port": "4500",
+				"remote-id": "test-opnsense-02",
+				"initiator-spi": "dfa4af3efd49188f",
+				"responder-spi": "9b8a7c70c241ea41",
+				"encr-alg": "AES_CBC",
+				"encr-keysize": "128",
+				"integ-alg": "HMAC_SHA2_256_128",
+				"prf-alg": "PRF_HMAC_SHA2_256",
+				"dh-group": "ECP_256",
+				"established": "249",
+				"rekey-time": "12879",
+				"child-sas": {
+					"52579354-fa25-4470-9a3a-75520ca52d43-2": {
+						"name": "52579354-fa25-4470-9a3a-75520ca52d43",
+						"uniqueid": "2",
+						"reqid": "1",
+						"state": "INSTALLED",
+						"mode": "TUNNEL",
+						"protocol": "ESP",
+						"spi-in": "cb3633fb",
+						"spi-out": "ce141695",
+						"encr-alg": "AES_CBC",
+						"encr-keysize": "128",
+						"integ-alg": "HMAC_SHA2_256_128",
+						"bytes-in": "0",
+						"packets-in": "0",
+						"bytes-out": "0",
+						"packets-out": "0",
+						"rekey-time": "3067",
+						"life-time": "3711",
+						"install-time": "249",
+						"local-ts": [
+							"0.0.0.0\/0"
+						],
+						"remote-ts": [
+							"0.0.0.0\/0"
+						]
+					}
+				}
+			}
+		],
+		"routed": true,
+		"local-class": "pre-shared key",
+		"remote-class": "pre-shared key"
+	}
+}
