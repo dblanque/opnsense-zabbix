@@ -243,10 +243,9 @@ function opnf_openvpn_serverdiscovery() {
 		$json_string = '{"data":[';
 
 		foreach ($servers as $server){
-		$name = trim(preg_replace('/\w{3}(\d)?\:\d{4,5}/i', '', $server['description']));
-		$json_string .= '{"{#SERVER}":"' . $server['vpnid'] . '"';
-		$json_string .= ',"{#NAME}":"' . $name . '"';
-		$json_string .= '},';
+			$json_string .= '{"{#SERVER}":"' . $server['vpnid'] . '"';
+			$json_string .= ',"{#NAME}":"' . $server['description'] . '"';
+			$json_string .= '},';
 		}
 
 		$json_string = rtrim($json_string,",");
