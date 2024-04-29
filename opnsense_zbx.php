@@ -233,7 +233,9 @@ function opnf_openvpn_get_all_servers(){
 	$ovpn_servers = array();
 	foreach ($ovpn_server_ids as $index => $ovpn_instance) {
 		$ovpn_server_id = $ovpn_instance['id'];
-		array_push($ovpn_servers, $ovpn_config->getInstanceById($ovpn_server_id));
+		// ---------------------------------- getInstanceById(server_id,    server_type)
+		$ovpn_server_instance = $ovpn_config->getInstanceById($ovpn_server_id, "server");
+		array_push($ovpn_servers, $ovpn_server_instance);
 	}
 	return ($ovpn_servers);
 }
