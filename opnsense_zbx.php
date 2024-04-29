@@ -228,8 +228,13 @@ function opnf_interface_discovery($is_wan=false,$is_cron=false) {
 
 // OpenVPN Server Discovery
 function opnf_openvpn_get_all_servers(){
-	$servers = openvpn_services();
-	return ($servers);
+	$ovpn_config = (new \OPNsense\OpenVPN\OpenVPN());
+    $ovpn_server_ids = openvpn_services();
+	$ovpn_servers = array();
+	foreach ($ovpn_server_ids as $ovpn_server_id => $ovpn_instance) {
+		array_push($ovpn_servers, $ovpn_config->getInstanceById($ovpn_server_id));
+	}
+	return ($ovpn_servers);
 }
 
 function opnf_openvpn_serverdiscovery() {
