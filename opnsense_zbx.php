@@ -553,8 +553,8 @@ function opnf_gw_value($gw, $valuekey) {
 			$value = $gws[$gw][$valuekey];
 			if ($valuekey=="status") {
 				//Issue #70: Gateway Forced Down
-				if ($gws[$gw]["substatus"]<>"none")
-					$value = $gws[$gw]["substatus"];
+				if ($gws[$gw]["status"]<>"none")
+					$value = $gws[$gw]["status"];
 
 				$value = opnf_valuemap("gateway.status", $value);
 			}
