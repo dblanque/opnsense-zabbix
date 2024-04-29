@@ -32,6 +32,12 @@ Original Zabbix pfSense Template by **R. Bicelli**
 
 ## Installation
 
+### OPNSense Configuration
+First you need to download the PHP Script onto your OPNSense.
+Login with SSH and execute the following command:
+
+`curl --create-dirs -o /root/scripts/opnsense_zbx.php https://raw.githubusercontent.com/dblanque/opnsense-zabbix/main/opnsense_zbx.php`
+
 ### Zabbix Configuration
 
 To enable this template you must add the following custom keys in the Zabbix Service Configuration.
