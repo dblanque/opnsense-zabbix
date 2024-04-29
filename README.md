@@ -61,6 +61,8 @@ You may also enable Root by allowing it in the Zabbix Settings and add the keys 
 
 ![opnsense_zbx_01](https://github.com/dblanque/opnsense-zabbix/assets/68660667/9fd17b20-3c7c-4a09-a816-9e422137d1c6)
 
+Do not forget to add the Zabbix Server or Proxy IP to your **Active Check Servers** Field 
+in the `Zabbix Features` tab as well as your **Zabbix Servers** field in the `Main Settings` tab.
 
 ### Enable System Version Cron
 
