@@ -42,10 +42,12 @@ Original Zabbix pfSense Template by **R. Bicelli**
 ## Installation
 
 ### OPNSense Configuration
-First you need to download the PHP Script onto your OPNSense.
+First you need to download the PHP Script, and legacy functions onto your OPNSense.
 Login with SSH and execute the following command:
 
 `curl --create-dirs -o /root/scripts/opnsense_zbx.php https://raw.githubusercontent.com/dblanque/opnsense-zabbix/main/opnsense_zbx.php`
+
+`curl --create-dirs -o /root/scripts/legacy_func.php https://github.com/dblanque/opnsense-zabbix/raw/refs/heads/main/legacy_func.php`
 
 ### Zabbix Configuration
 
