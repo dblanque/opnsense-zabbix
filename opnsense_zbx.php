@@ -175,7 +175,12 @@ function opnf_interface_discovery($is_wan=false,$is_cron=false) {
 
 		$eval_if = preg_replace('/[0-9]+/', '', $if_val['if']);
 		if (in_array($eval_if, $ppp_types)) {
-			$hwif = get_ppp_parent($if_val['if']);
+			if ( function_exists("get_ppp_parent") ) {
+				$hwif = get_ppp_parent($if_val['if']);
+			}
+			elseif ( function_exists("interface_ppps_hardware") ) {
+				$hwif = interface_ppps_hardware($if_val['if'])[0];
+			}
 		}
 		else {
 			$hwif = get_real_interface($if_val['if']);
