@@ -27,9 +27,6 @@ require_once('plugins.inc.d/openvpn.inc');
 // For System
 require_once('system.inc');
 
-// ! Deprecated
-// require dirname(__FILE__).'/legacy_func.php';
-
 require_once("script/load_phalcon.php");
 use OPNsense\Core\Config;
 
@@ -122,15 +119,6 @@ function opnf_test(){
 		// ! Deprecated
 		echo "Network Interfaces:\n";
 		print_r(opnf_interface_discovery());
-		// $ifdescrs = get_configured_interface_with_descr();
-		// $ifaces=array();
-		// foreach ($ifdescrs as $ifdescr => $ifname){	
-		// 	$ifinfo = get_interfaces_info($ifdescr);
-		// 	$ifaces[$ifname] = $ifinfo;
-		// }
-		// print_r($ifaces);
-		// print_r(get_interface_list());
-		// print_r(legacy_config_get_interfaces(['virtual' => false]));
 		echo $line;
 
 		echo "Interface Statistics:\n";
