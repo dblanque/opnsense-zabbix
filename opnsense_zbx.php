@@ -24,6 +24,9 @@ require_once('interfaces.inc');
 // For OpenVPN Discovery
 require_once('plugins.inc.d/openvpn.inc');
 
+// For Wireguard Discovery
+require_once('plugins.inc.d/wireguard.inc');
+
 // For System
 require_once('system.inc');
 
@@ -222,6 +225,39 @@ function opnf_interface_discovery($is_wan=false,$is_cron=false) {
 	echo $json_string;
 }
 
+function opnf_t_serverdiscovery($T) {
+	$callable = "opnf_${T}_get_all_servers";
+	$servers = $callable();
+
+	$json_string = '{"data":[';
+
+	foreach ($servers as $server){
+		$json_string .= '{"{#SERVER}":"' . $server['vpnid'] . '"';
+		$json_string .= ',"{#NAME}":"' . $server['description'] . '"';
+		$json_string .= '},';
+	}
+
+	$json_string = rtrim($json_string,",");
+	$json_string .= "]}";
+
+	echo $json_string;
+}
+
+// WireGuard Server Discovery
+function opnf_wireguard_get_all_servers(){
+	$wg_enabled = ((new OPNsense\Wireguard\General())->enabled);
+	$wg_server_ids = wireguard_services();
+	$wg_servers = array();
+	foreach ((new OPNsense\Wireguard\Server())->servers->server->iterateItems() as $key => $node) {
+		$wg_server_instance = array();
+		$wg_server_instance['vpnid'] = $key;
+		$wg_server_instance['description'] = (string)$node->name;
+		if ((bool)$node->enabled)
+			array_push($wg_servers, $wg_server_instance);
+	}
+	return ($wg_servers);
+}
+
 // OpenVPN Server Discovery
 function opnf_openvpn_get_all_servers(){
 	$ovpn_config = (new \OPNsense\OpenVPN\OpenVPN());
@@ -236,24 +272,6 @@ function opnf_openvpn_get_all_servers(){
 	}
 	return ($ovpn_servers);
 }
-
-function opnf_openvpn_serverdiscovery() {
-		$servers = opnf_openvpn_get_all_servers();
-
-		$json_string = '{"data":[';
-
-		foreach ($servers as $server){
-			$json_string .= '{"{#SERVER}":"' . $server['vpnid'] . '"';
-			$json_string .= ',"{#NAME}":"' . $server['description'] . '"';
-			$json_string .= '},';
-		}
-
-		$json_string = rtrim($json_string,",");
-		$json_string .= "]}";
-
-		echo $json_string;
-}
-
 
 // Get OpenVPN Server Value
 function opnf_openvpn_servervalue($server_id,$valuekey){
@@ -1405,8 +1423,11 @@ switch (strtolower($section)){
 	case "wan":
 		opnf_interface_discovery(true);
 		break;
+	case "wireguard_server":
+		opnf_t_serverdiscovery("wireguard");
+		break;
 	case "openvpn_server":
-		opnf_openvpn_serverdiscovery();
+		opnf_t_serverdiscovery("openvpn");
 		break;
 	case "openvpn_server_user":
 		opnf_openvpn_server_userdiscovery();
