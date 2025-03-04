@@ -292,10 +292,14 @@ function opnf_openvpn_servervalue($server_id,$valuekey){
 						}
 					break;
 					case "port":
-						if ($value=="") $value = $server['local_port'];
+						if ($value=="")
+							$value = $server['local_port'];
 					break;
 					case "real_address":
-						if ($value=="" && property_exists($clients, "real_address")) $value = $clients->real_address;
+						if (is_null($clients))
+							$value = "";
+						elseif ($value=="" && property_exists($clients, "real_address"))
+							$value = $clients->real_address;
 					break;
 				}
 			}
