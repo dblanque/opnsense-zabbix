@@ -644,7 +644,10 @@ function opnf_ipsec_discovery_ph1($as_array=false){
 	$a_phase1 = &$config['ipsec']['phase1'];
 	$connections = [];
 	$json_string = '{"data":[';
-
+	if (array_key_exists("descr", $a_phase1)){
+		$a_phase1 = array($a_phase1);
+	}
+	
 	foreach ($a_phase1 as $data) {
 		if (!array_key_exists("descr", $data))
 			$description = "Legacy IPSec Phase 1 Tunnel";
@@ -712,6 +715,9 @@ function opnf_ipsec_discovery_ph2($as_array=false){
 	$a_phase2 = &$config['ipsec']['phase2'];
 	$connections = [];
 	$json_string = '{"data":[';
+	if (array_key_exists("ikeid", $a_phase2)){
+		$a_phase2 = array($a_phase2);
+	}
 
 	foreach ($a_phase2 as $data) {
 		if (!array_key_exists("descr", $data))
