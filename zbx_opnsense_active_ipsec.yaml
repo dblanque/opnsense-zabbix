@@ -1,0 +1,246 @@
+zabbix_export:
+  version: '6.0'
+  date: '2025-06-19T13:19:29Z'
+  groups:
+    -
+      uuid: 4918b88734c54bd094cff7585b5d71fc
+      name: 'Templates/Network Devices'
+  templates:
+    -
+      uuid: 76aa5b715b7d4b4aabdf5dca58ed68b2
+      template: 'Template opnSense Active IPsec'
+      name: 'OPNSense Active: IPsec'
+      description: |
+        Active template for opnsense, requires opnsense_zbx.php installed to OPNSense Box.
+        Monitor IPsec VPN.
+                        
+        Version 1.0.1
+        
+        https://github.com/dblanque/opnsense-zabbix
+      groups:
+        -
+          name: 'Templates/Network Devices'
+      discovery_rules:
+        -
+          uuid: 5d99ec27490948b1a22b6e1bb87cf8cc
+          name: 'IPsec Phase 1 Discovery'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.discovery[ipsec_ph1]'
+          delay: 1200s
+          description: 'Discovery of IPsec Phase 1'
+          item_prototypes:
+            -
+              uuid: c0d4547c59484058a467fef5b3c098b3
+              name: 'IPsec Tunnel {#IKEID} {#NAME} Tunnel Enabled'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph1,{#IKEID},disabled]'
+              delay: 120s
+              description: 'IPsec Phase 1  Tunnel Mode'
+              valuemap:
+                name: 'opnSense IPsec Enabled'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+            -
+              uuid: 2d885e23a8854dee9cee39ea5d8668d5
+              name: 'IPsec Tunnel {#IKEID} {#NAME} IKE Type'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph1,{#IKEID},iketype]'
+              delay: 600s
+              description: 'IPsec Phase 1 IKE Type'
+              valuemap:
+                name: 'opnSense IPsec IKE Type'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+            -
+              uuid: 5c0df37416be4fa39e9acb50b73c26b4
+              name: 'IPsec Tunnel {#IKEID} {#NAME} Tunnel Mode'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph1,{#IKEID},mode]'
+              delay: 600s
+              description: 'IPsec Phase 1  Tunnel Mode'
+              valuemap:
+                name: 'opnSense IPsec Tunnel Mode'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+            -
+              uuid: 6325229ec5be4d0d90de5034f8cca59e
+              name: 'IPsec Tunnel {#IKEID} {#NAME} Protocol'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph1,{#IKEID},protocol]'
+              delay: 600s
+              description: 'IPsec Phase 1 Protocol'
+              valuemap:
+                name: 'opnSense IPsec Protocol'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+            -
+              uuid: 1c7c0bf5479e45a8b513a82aaee6ea3b
+              name: 'IPsec Tunnel {#IKEID} {#NAME}  Remote Gateway'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph1,{#IKEID},remote-gateway]'
+              delay: 600s
+              trends: '0'
+              value_type: TEXT
+              description: 'IPsec Phase 1  Remote Gateway'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+            -
+              uuid: 0f06128058714627865976c6e52fa3f3
+              name: 'IPsec Tunnel {#IKEID} {#NAME}  Phase 1 Status'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph1,{#IKEID},status]'
+              delay: 60s
+              description: 'IPsec Phase 1  Tunnel Mode'
+              valuemap:
+                name: 'opnSense IPsec Phase 1 Status'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+          trigger_prototypes:
+            -
+              uuid: d3427e0d7e30413484bf77e09b17fe53
+              expression: 'last(/Template opnSense Active IPsec/opnsense.value[ipsec_ph1,{#IKEID},disabled])=0 and last(/Template opnSense Active IPsec/opnsense.value[ipsec_ph1,{#IKEID},status])<>1 and last(/Template opnSense Active IPsec/opnsense.value[ipsec_ph1,{#IKEID},status])<10'
+              name: 'IPsec Tunnel {#IKEID} ({#NAME}) Not Connected'
+              priority: HIGH
+              description: 'IPsec Phase 1 is not connected.'
+        -
+          uuid: 414e60a982cd49f3bb2a35eda800293b
+          name: 'IPsec Phase 2 Discovery'
+          type: ZABBIX_ACTIVE
+          key: 'opnsense.discovery[ipsec_ph2]'
+          delay: 1200s
+          description: 'Discovery of IPsec Phase 2'
+          item_prototypes:
+            -
+              uuid: 83a2181db5464d5698a966eafab8a33e
+              name: 'IPsec Tunnel  {#IKEID}.{#REQID} {#NAME} Phase 2 Enabled'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph2,{#UNIQID},disabled]'
+              delay: 120s
+              description: 'IPsec Tunnel Phase 2 Protocol'
+              valuemap:
+                name: 'opnSense IPsec Enabled'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+            -
+              uuid: 245eed965cb4486187282fbe41acb330
+              name: 'IPsec Tunnel  {#IKEID}.{#REQID} {#NAME} Phase 2 Life Time'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph2,{#UNIQID},lifetime]'
+              delay: 600s
+              units: s
+              description: 'IPsec Tunnel Phase 2 Life Time'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+            -
+              uuid: 28099d05480247e29d23afe77a5a9a8b
+              name: 'IPsec Tunnel  {#IKEID}.{#REQID} {#NAME} Phase 2 Mode'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph2,{#UNIQID},mode]'
+              delay: 600s
+              description: 'IPsec Tunnel Phase 2 Mode'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+            -
+              uuid: a820bf961fed4dd58afcba4986e5cabb
+              name: 'IPsec Tunnel  {#IKEID}.{#REQID} {#NAME} Phase 2 Protocol'
+              type: ZABBIX_ACTIVE
+              key: 'opnsense.value[ipsec_ph2,{#UNIQID},protocol]'
+              delay: 600s
+              description: 'IPsec Tunnel Phase 2 Protocol'
+              valuemap:
+                name: 'opnSense IPsec Phase 2 Protocol'
+              tags:
+                -
+                  tag: Application
+                  value: IPsec
+      valuemaps:
+        -
+          uuid: a15f750487f5429c92ff5e1d6a81ae1f
+          name: 'opnSense IPsec Enabled'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Yes'
+            -
+              value: '1'
+              newvalue: 'No'
+        -
+          uuid: 7a4835f4bc5f4510aa04c1f241923b69
+          name: 'opnSense IPsec IKE Type'
+          mappings:
+            -
+              value: '0'
+              newvalue: Auto
+            -
+              value: '1'
+              newvalue: 'IKE v1'
+            -
+              value: '2'
+              newvalue: 'IKE v2'
+        -
+          uuid: 840e5abd53b947ddad646037f84d8c4c
+          name: 'opnSense IPsec Phase 1 Status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Established
+            -
+              value: '2'
+              newvalue: Connecting
+            -
+              value: '10'
+              newvalue: 'Down on CARP Secondary'
+        -
+          uuid: 40f9939b234c44059e9b531abaf09364
+          name: 'opnSense IPsec Phase 2 Protocol'
+          mappings:
+            -
+              value: '1'
+              newvalue: ESP
+            -
+              value: '2'
+              newvalue: AH
+        -
+          uuid: db33c57fb5904767bcb5233d0486ab99
+          name: 'opnSense IPsec Protocol'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Dual Stack (IPv4 & IPv6)'
+            -
+              value: '1'
+              newvalue: IPv4
+            -
+              value: '2'
+              newvalue: IPv6
+        -
+          uuid: 3f481d2513894d6bb3f624a2d8a951ec
+          name: 'opnSense IPsec Tunnel Mode'
+          mappings:
+            -
+              value: '0'
+              newvalue: Main
+            -
+              value: '1'
+              newvalue: Aggressive
