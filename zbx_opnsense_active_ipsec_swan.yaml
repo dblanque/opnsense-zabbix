@@ -33,7 +33,7 @@ zabbix_export:
               uuid: d30f984078874cf99e68f1e65f8e310c
               name: 'IPsec Swan Connection {#NAME} Enabled ({#IKEID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},enabled]'
+              key: 'opnsense.value[ipsec_swan_connections,{#IKEID},enabled]'
               delay: 120s
               description: 'IPsec Connection Enabled'
               valuemap:
@@ -46,7 +46,7 @@ zabbix_export:
               uuid: daa5b115163e4c908703ceb6dd61e35e
               name: 'IPsec Swan Connection {#NAME} IKE Type ({#IKEID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},version]'
+              key: 'opnsense.value[ipsec_swan_connections,{#IKEID},version]'
               delay: 600s
               description: 'IPsec Connection IKE Type'
               value_type: TEXT
@@ -58,7 +58,7 @@ zabbix_export:
               uuid: c1ae22aa16364b24b27d090211e29baf
               name: 'IPsec Swan Connection {#NAME} MOBIKE ({#IKEID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},mobike]'
+              key: 'opnsense.value[ipsec_swan_connections,{#IKEID},mobike]'
               delay: 600s
               description: 'IPsec Connection MOBIKE'
               valuemap:
@@ -71,7 +71,7 @@ zabbix_export:
               uuid: 3c930589b9124ad6add92952e5cc6ae3
               name: 'IPsec Swan Connection {#NAME} Tunnel Mode ({#IKEID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},aggressive]'
+              key: 'opnsense.value[ipsec_swan_connections,{#IKEID},aggressive]'
               delay: 600s
               description: 'IPsec Connection Tunnel Mode'
               valuemap:
@@ -84,7 +84,7 @@ zabbix_export:
               uuid: 531c6c41e4b9481db57f1d8e3291328a
               name: 'IPsec Swan Connection {#NAME} Remote Gateway(s) ({#IKEID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},remote_addrs]'
+              key: 'opnsense.value[ipsec_swan_connections,{#IKEID},remote_addrs]'
               delay: 600s
               trends: '0'
               value_type: TEXT
@@ -97,7 +97,7 @@ zabbix_export:
               uuid: dfad934fd1f74aac8af2bd0be42fa0f5
               name: 'IPsec Swan Connection {#NAME} Local Gateway(s) ({#IKEID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},local_addrs]'
+              key: 'opnsense.value[ipsec_swan_connections,{#IKEID},local_addrs]'
               delay: 600s
               trends: '0'
               value_type: TEXT
@@ -110,7 +110,7 @@ zabbix_export:
               uuid: 1e0de765775f480a8815c925c7e42580
               name: 'IPsec Swan Connection {#NAME} Status ({#IKEID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},status]'
+              key: 'opnsense.value[ipsec_swan_connections,{#IKEID},status]'
               delay: 60s
               description: 'IPsec Swan Connection Status'
               value_type: TEXT
@@ -121,7 +121,7 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: acad4a6ea6c9425fa5d53aa3f446d98f
-              expression: 'last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},enabled])=1 and last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},status])<>"ESTABLISHED" '
+              expression: 'last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan_connections,{#IKEID},enabled])=1 and last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan_connections,{#IKEID},status])<>"ESTABLISHED" '
               name: 'IPsec Swan Connection ({#NAME}) Not Connected ({#IKEID})'
               priority: HIGH
               description: 'IPsec Swan Connection is not connected.'
@@ -137,7 +137,7 @@ zabbix_export:
               uuid: d88f54d6d6c8467ba731adb751c0dbb4
               name: 'IPsec Swan Child {#NAME} Enabled ({#IKEID}.{#REQID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},enabled,children]'
+              key: 'opnsense.value[ipsec_swan_children,{#IKEID},enabled]'
               delay: 120s
               description: 'IPsec Swan Child Protocol'
               valuemap:
@@ -150,7 +150,7 @@ zabbix_export:
               uuid: e82336d56a1b462980a7d56d88e51329
               name: 'IPsec Swan Child {#NAME} Mode ({#IKEID}.{#REQID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},mode,children]'
+              key: 'opnsense.value[ipsec_swan_children,{#IKEID},mode]'
               delay: 600s
               value_type: TEXT
               description: 'IPsec Swan Child Mode'
@@ -162,7 +162,7 @@ zabbix_export:
               uuid: 4572dbd1e67d40b6a0a17e15fe96a8c3
               name: 'IPsec Swan Child {#NAME} Re-key Time ({#IKEID}.{#REQID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},rekey_time,children]'
+              key: 'opnsense.value[ipsec_swan_children,{#IKEID},rekey_time]'
               delay: 600s
               units: s
               description: 'IPsec Swan Child  Re-key Time'
@@ -174,7 +174,7 @@ zabbix_export:
               uuid: e8420d827a8b477b9f47152a0921c261
               name: 'IPsec Swan Child {#NAME} Status ({#IKEID}.{#REQID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#IKEID},status,children]'
+              key: 'opnsense.value[ipsec_swan_children,{#IKEID},status]'
               delay: 60s
               description: 'IPsec Swan Child Status'
               value_type: TEXT
@@ -185,10 +185,10 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: 3149095c806b49b8885307f063742e80
-              expression: 'last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},enabled,children])=1 and last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},status,children])<>"INSTALLED"'
-              name: 'IPsec Swan Connection ({#NAME}) Not Connected ({#IKEID})'
+              expression: 'last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan_children,{#IKEID},enabled])=1 and last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan_children,{#IKEID},status])<>"INSTALLED"'
+              name: 'IPsec Swan Child ({#NAME}) Not Connected ({#IKEID})'
               priority: HIGH
-              description: 'IPsec Swan Connection is not connected.'                  
+              description: 'IPsec Swan Child is not connected.'                  
       valuemaps:
         -
           uuid: bfab6ac9afd94b179ea0af4556104f0e

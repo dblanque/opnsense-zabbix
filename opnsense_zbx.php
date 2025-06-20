@@ -690,13 +690,11 @@ function opnf_ipsec_swan($ikeid, $valuekey, $type)
 {
 	//Requests the config.xml "on disk"
 	$swanctl = (new \OPNsense\IPsec\Swanctl());
-	if ($type == NULL) $type = "Connections";
 	$opt = match ($type) {
 		"Connections" => "Connection",
 		"children" => "child",
 	};
 	$swan = $swanctl->getNodes()[$type];
-
 	$value = "";
 	switch ($valuekey) {
 		case 'status':
@@ -707,7 +705,7 @@ function opnf_ipsec_swan($ikeid, $valuekey, $type)
 		default:
 			foreach ($swan[$opt] as $current_ikeid => $connection) {
 				if ($current_ikeid == $ikeid) {
-					if (array_key_exists($valuekey, $connection)) {						
+					if (array_key_exists($valuekey, $connection)) {
 						if ($valuekey == 'disabled')
 							$value = "1";
 						else
@@ -991,11 +989,9 @@ function opnf_ipsec_swan_status($ikeid, $type) //, $reqid = -1, $valuekey = 'sta
 	}
 	if (in_array('ESTABLISHED', $states)) {
 		return 'ESTABLISHED';
-	} 
-	else if (in_array('INSTALLED', $states)) {
+	} else if (in_array('INSTALLED', $states)) {
 		return 'INSTALLED';
-	} 
-	else {
+	} else {
 		return $states[0];
 	}
 }
@@ -1726,8 +1722,11 @@ switch ($mainArgument) {
 	case "ipsec_ph2":
 		opnf_ipsec_ph2($argv[2], $argv[3]);
 		break;
-	case "ipsec_swan":
-		opnf_ipsec_swan($argv[2], $argv[3], $argv[4]);
+	case "ipsec_swan_connections":
+		opnf_ipsec_swan($argv[2], $argv[3], "Connections");
+		break;
+	case "ipsec_swan_children":
+		opnf_ipsec_swan($argv[2], $argv[3], "children");
 		break;
 	case "dhcp":
 		opnf_dhcp($argv[2], $argv[3]);
