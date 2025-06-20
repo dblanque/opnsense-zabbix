@@ -7,6 +7,11 @@ For 25.1.x - 2025-06-20
 Original pfSense Template Written by Riccardo Bicelli <r.bicelli@gmail.com>
 New OPNSense Modifications by Dylan Blanqué <dylan.blanque@gmail.com>
 This program is licensed under Apache 2.0 License
+
+Contributors:
+	- dblanque
+	- julioliraup
+	- silureth
  */
 
 // Some Useful defines
