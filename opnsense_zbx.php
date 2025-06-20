@@ -246,7 +246,7 @@ function opnf_interface_discovery($is_wan = false, $is_cron = false)
 
 function opnf_t_serverdiscovery($T)
 {
-	$callable = "opnf_${T}_get_all_servers";
+	$callable = "opnf_{$T}_get_all_servers";
 	$servers = $callable();
 
 	$json_string = '{"data":[';
