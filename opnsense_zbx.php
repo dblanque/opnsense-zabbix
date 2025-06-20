@@ -2,7 +2,7 @@
 
 /***
 opnsense_zbx.php - OPNSense Zabbix Interface
-For 24.1.3 - 2024-03-13
+For 25.1.x - 2025-06-20
 
 Original pfSense Template Written by Riccardo Bicelli <r.bicelli@gmail.com>
 New OPNSense Modifications by Dylan Blanqué <dylan.blanque@gmail.com>
@@ -32,6 +32,7 @@ require_once('plugins.inc.d/wireguard.inc');
 require_once('system.inc');
 
 require_once("script/load_phalcon.php");
+
 
 use OPNsense\Core\Config;
 
@@ -607,51 +608,73 @@ function opnf_gw_value($gw, $valuekey)
 	}
 }
 
-// Accumulate all types (Legacy PH1, PH2, SWAN)
-function opnf_ipsec_discovery($ipsec_types = array("all"))
-{
-	$swanconns = array();
-	$ph1_conns = array();
-	$ph2_conns = array();
-	if (in_array("all", $ipsec_types) || in_array("swan", $ipsec_types)) {
-		$swanconns = opnf_ipsec_discovery_swan(true);
-	}
-	if (in_array("all", $ipsec_types) || in_array("legacy_ph1", $ipsec_types)) {
-		$ph1_conns = opnf_ipsec_discovery_ph1(true);
-	}
-	if (in_array("all", $ipsec_types) || in_array("legacy_ph1", $ipsec_types)) {
-		$ph2_conns = opnf_ipsec_discovery_ph2(true);
-	}
-	$connections = array_merge($swanconns, $ph1_conns, $ph2_conns);
-	print_r($connections);
-	return $connections;
-}
+// Accumulate all types (Legacy PH1, PH2, SWAN) // NOT NEEDED
+// function opnf_ipsec_discovery($ipsec_types = array("all"))
+// {
+// 	$swanconns = array();
+// 	$ph1_conns = array();
+// 	$ph2_conns = array();
+// 	if (in_array("all", $ipsec_types) || in_array("swan", $ipsec_types)) {
+// 		$swanconns = opnf_ipsec_discovery_swan(true);
+// 	}
+// 	if (in_array("all", $ipsec_types) || in_array("legacy_ph1", $ipsec_types)) {
+// 		$ph1_conns = opnf_ipsec_discovery_ph1(true);
+// 	}
+// 	if (in_array("all", $ipsec_types) || in_array("legacy_ph1", $ipsec_types)) {
+// 		$ph2_conns = opnf_ipsec_discovery_ph2(true);
+// 	}
+// 	$connections = array_merge($swanconns, $ph1_conns, $ph2_conns);
+// 	print_r($connections);
+// 	return $connections;
+// }
 
 // IPSEC Discovery for Strongswan
-function opnf_ipsec_discovery_swan($as_array = false)
+function opnf_ipsec_discovery_swan($type, $as_array = false)
 {
 	$swanctl = (new \OPNsense\IPsec\Swanctl());
-	$swanconns = $swanctl->getNodes()["Connections"];
+	$swan = $swanctl->getNodes()[$type];
 	$connections = [];
 	$json_string = '{"data":[';
-
-	foreach ($swanconns["Connection"] as $ikeid => $data) {
+	$opt = match ($type) {
+		"Connections" => "Connection",
+		"children" => "child",
+	};
+	//$opt =  ($type == "Connections")? "Connection" : "child";
+	//print $swanconns;
+	foreach ($swan[$opt] as $ikeid => $data) {
 		if (!array_key_exists("description", $data))
 			$description = "Strongswan IPSec Tunnel";
 		else
 			$description = $data["description"];
 
-		if ($as_array === true) {
-			$c = array(
-				"ikeid"	=>	$ikeid,
-				"name"	=>	$data["description"],
-				"type"	=>	"swan",
-			);
-			array_push($connections, $c);
+		if ($opt == "child") {
+			if ($as_array === true) {
+				$c = array(
+					"ikeid"	=>	$ikeid,
+					"name"	=>	$data["description"],
+					"reqid" =>	$data["reqid"],
+					"type"	=>	"swan child",
+				);
+				array_push($connections, $c);
+			} else {
+				$json_string .= '{"{#IKEID}":"' . $ikeid . '"';
+				$json_string .= ',"{#NAME}":"' . $data['description'] . '"';
+				$json_string .= ',"{#REQID}":"' .  $data['reqid'] . '"';
+				$json_string .= '},';
+			}
 		} else {
-			$json_string .= '{"{#IKEID}":"' . $ikeid . '"';
-			$json_string .= ',"{#NAME}":"' . $data['description'] . '"';
-			$json_string .= '},';
+			if ($as_array === true) {
+				$c = array(
+					"ikeid"	=>	$ikeid,
+					"name"	=>	$data["description"],
+					"type"	=>	"swan con",
+				);
+				array_push($connections, $c);
+			} else {
+				$json_string .= '{"{#IKEID}":"' . $ikeid . '"';
+				$json_string .= ',"{#NAME}":"' . $data['description'] . '"';
+				$json_string .= '},';
+			}
 		}
 	}
 
@@ -662,46 +685,29 @@ function opnf_ipsec_discovery_swan($as_array = false)
 	echo $json_string;
 }
 
-function opnf_ipsec_swan($ikeid, $valuekey)
+
+function opnf_ipsec_swan($ikeid, $valuekey, $type)
 {
 	//Requests the config.xml "on disk"
 	$swanctl = (new \OPNsense\IPsec\Swanctl());
-	// 1. Get the IPsec Service controller
-	// This class is designed to interact with the running strongSwan daemon
-	//$ipsecService = new \OPNsense\IPsec\Service();
-
-	// 2. Fetch the live Security Associations (SAs)
-	// This returns a rich, nested array with everything you need.
-	//$live_sas = $ipsecService->listSas();
-	$swanconns_container = $swanctl->getNodes()["Connections"];
-	$swanchilds_container = $swanctl->getNodes()["children"];
-	$nodes = $swanctl->getNodes();
-	print_r(array_keys($nodes));
-	$connections = [];
-	$json_string = '{"data":[';
+	if ($type == NULL) $type = "Connections";
+	$opt = match ($type) {
+		"Connections" => "Connection",
+		"children" => "child",
+	};
+	$swan = $swanctl->getNodes()[$type];
 
 	$value = "";
 	switch ($valuekey) {
 		case 'status':
-			//$value = opnf_ipsec_status($ikeid);
-			//TODO
+			$value = opnf_ipsec_swan_status($ikeid, $opt);
 			break;
 		case 'disabled':
 			$value = "0";
 		default:
-
-			foreach ($swanchilds_container["child"] as $current_ikeid => $child) {
-					var_dump($child);
-					if ($current_ikeid == $ikeid) {
-					}
-			}
-
-			foreach ($swanconns_container["Connection"] as $current_ikeid => $connection) {
-
+			foreach ($swan[$opt] as $current_ikeid => $connection) {
 				if ($current_ikeid == $ikeid) {
-					//Get the chidlren
-					var_dump($connection);
-					if (array_key_exists($valuekey, $connection)) {
+					if (array_key_exists($valuekey, $connection)) {						
 						if ($valuekey == 'disabled')
 							$value = "1";
 						else
@@ -713,6 +719,7 @@ function opnf_ipsec_swan($ikeid, $valuekey)
 	}
 	echo $value;
 }
+
 
 function opnf_ipsec_discovery_ph1($as_array = false)
 {
@@ -948,6 +955,49 @@ function opnf_ipsec_status($ikeid, $reqid = -1, $valuekey = 'state', $ipsec_type
 	}
 
 	return $value;
+}
+function opnf_ipsec_swan_status($ikeid, $type) //, $reqid = -1, $valuekey = 'state', $ipsec_type = "swan")
+{
+	//Connection,Child
+	$statuses = ipsec_get_status();
+	$states = [];
+	if ($type == 'Connection') {
+		foreach ($statuses as $current_ikeid => $connection) {
+			if ($current_ikeid == $ikeid) {
+				foreach ($connection->sas as $sas_item) {
+					if (isset($sas_item->state)) {
+						$states[] = $sas_item->state;
+					}
+				}
+			}
+		}
+	}
+	if ($type == 'child') {
+		foreach ($statuses as $current_ikeid => $connection) {
+			foreach ($connection->sas as $sas_item) {
+
+				foreach ($sas_item->{'child-sas'} as $current_child_sa => $childSa) {
+					if (isset($childSa->name) && $childSa->name == $ikeid) {
+						if (isset($childSa->state)) {
+							$states[] = $childSa->state;
+						}
+					}
+				}
+			}
+		}
+	}
+	if (empty($states)) {
+		return 'N/A';
+	}
+	if (in_array('ESTABLISHED', $states)) {
+		return 'ESTABLISHED';
+	} 
+	else if (in_array('INSTALLED', $states)) {
+		return 'INSTALLED';
+	} 
+	else {
+		return $states[0];
+	}
 }
 
 // Temperature sensors Discovery
@@ -1552,6 +1602,19 @@ function opnf_valuemap_swan($valuename, $value, $default = "0")
 			}
 			return 'N/A';
 			break;
+		case "ipsec_swan.remote_addrs":
+		case "ipsec_swan.local_addrs":
+		case "ipsec_swan.local_port":
+		case "ipsec_swan.remote_port":
+		case "ipsec_swan.esp_proposals":
+		case "ipsec_swan.mode": {
+				$selectedItems = array_filter($value, function ($item) {
+					return isset($item['selected']) && $item['selected'] == 1;
+				});
+				$values = array_column($selectedItems, 'value');
+				if (empty($values)) return 'N/A';
+				return $value = implode(';', $values);
+			}
 	}
 
 
@@ -1592,8 +1655,11 @@ function opnf_discovery($section)
 		case "ipsec_ph2":
 			opnf_ipsec_discovery_ph2();
 			break;
-		case "ipsec_swan":
-			opnf_ipsec_discovery_swan();
+		case "ipsec_swan_connections":
+			opnf_ipsec_discovery_swan("Connections");
+			break;
+		case "ipsec_swan_children":
+			opnf_ipsec_discovery_swan("children");
 			break;
 		case "dhcpfailover":
 			opnf_dhcpfailover_discovery();
@@ -1661,7 +1727,7 @@ switch ($mainArgument) {
 		opnf_ipsec_ph2($argv[2], $argv[3]);
 		break;
 	case "ipsec_swan":
-		opnf_ipsec_swan($argv[2], $argv[3]);
+		opnf_ipsec_swan($argv[2], $argv[3], $argv[4]);
 		break;
 	case "dhcp":
 		opnf_dhcp($argv[2], $argv[3]);
