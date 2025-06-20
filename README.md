@@ -1,43 +1,34 @@
 ## Introduction
-Out of pure personal need I adapted **R. Bicelli's** _pfSense Zabbix Template_ after the recent Home+Lab License Issue *encouraged* me to migrate to OPNSense.
-This is not yet completely tested in all regards and some keys and functionalities may have errors.
+Out of pure personal need I adapted **R. Bicelli's** _pfSense Zabbix Template_ after the **Home+Lab** License Issue *encouraged* me to migrate to OPNSense.
 
-I mostly centered myself on fixing OpenVPN monitoring and basic keys support. Feel free to contribute!
+This is provided as is and some keys and functionalities can have errors.
+
+Feel free to contribute by reporting bugs or submitting PRs!
 
 Original Zabbix pfSense Template by **R. Bicelli**
 <https://github.com/rbicelli/pfsense-zabbix-template>
 
-* 2024-02-01: Fix for OPNSense 24.1 `get_interfaces_info()` function deprecation was implemented. The templates were also updated with new item key implementations for the Network Interfaces.
-* 2024-04-29:
-	* Fixed Individual Gateway Status support.
-	* Fixed OpenVPN Server Data Fetching to support both *Legacy* and *MVC* Instances.
-	* Renamed all function prefixes from *pfz_* to *opnf_*.
-	* Minor fixes to further implement IPSec (Both Strongswan and Legacy instances) detection and status reporting, not tested.
-	* Other minor fixes.
+*Tested on Zabbix 6.0-7.0 LTS*
 
-*Tested on Zabbix 6.0 LTS*
+### Contributors
+* **Riccardo Bicelli** ([rbicelli](https://github.com/rbicelli), project forked from pfSense Template Repository)
+* **Dylan Blanqué** ([dblanque](https://github.com/dblanque), repository maintainer)
+* **Julio Liraup** ([julioliraup](https://github.com/julioliraup))
+* **Herczeg Szilárd** ([silureth](https://github.com/silureth), Added IPSec/Swan Support)
 
 ### Would you like to support me?
 <a href='https://ko-fi.com/E1E2YQ4TG' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 ## Functionalities
 
-### Tested
 * Service Discovery
 * OpenVPN Server Discovery and Statistics
 * OpenVPN Server Clients Discovery
 * All default FreeBSD Items
 * Network Statistics
 * Gateway Discovery
-
-### Added
+* IPSec (SWAN)
 * P2P TLS OpenVPN Server Remote Address Item Monitoring
-
-## Known Issues, or untested
-* OPNSense OpenVPN Clients (as in site to site clients) may not be discovered correctly yet.
-* DHCP Lease Functions *probably* don't work.
-* **IPSec Functions are untested**.
-* **CARP Functions are untested**.
 
 ## Installation
 
