@@ -1750,3 +1750,4 @@ switch ($mainArgument) {
 		opnf_test();
 		break;
 }
+?>
