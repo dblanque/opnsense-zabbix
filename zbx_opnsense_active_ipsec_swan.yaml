@@ -7,7 +7,7 @@ zabbix_export:
       name: 'Templates/Network Devices'
   templates:
     -
-      uuid: 76aa5b715b7d4b4aabdf5dca58ed68b2
+      uuid: 02cab2d444bf4295b6c9e7e82c087f10
       template: 'Template opnSense Active IPsec Swan'
       name: 'OPNSense Active: IPsec Swan'
       description: |
@@ -22,7 +22,7 @@ zabbix_export:
           name: 'Templates/Network Devices'
       discovery_rules:
         -
-          uuid: 5d99ec27490948b1a22b6e1bb87cf8cc
+          uuid: 329c69cc3dc34147be7ea8f81098f483
           name: 'IPsec Swan Connections Discovery'
           type: ZABBIX_ACTIVE
           key: 'opnsense.discovery[ipsec_swan_connections]'
@@ -30,7 +30,7 @@ zabbix_export:
           description: 'Discovery of IPsec Swan Connections'
           item_prototypes:
             -
-              uuid: c0d4547c59484058a467fef5b3c098b3
+              uuid: d30f984078874cf99e68f1e65f8e310c
               name: 'IPsec Swan Connection {#NAME} Enabled ({#IKEID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},enabled]'
@@ -43,7 +43,7 @@ zabbix_export:
                   tag: Application
                   value: IPsec
             -
-              uuid: 2d885e23a8854dee9cee39ea5d8668d5
+              uuid: daa5b115163e4c908703ceb6dd61e35e
               name: 'IPsec Swan Connection {#NAME} IKE Type ({#IKEID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},version]'
@@ -55,7 +55,7 @@ zabbix_export:
                   tag: Application
                   value: IPsec
             -
-              uuid: 5c0df37416be4fa39e9acb50b73c26b4
+              uuid: c1ae22aa16364b24b27d090211e29baf
               name: 'IPsec Swan Connection {#NAME} MOBIKE ({#IKEID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},mobike]'
@@ -68,7 +68,7 @@ zabbix_export:
                   tag: Application
                   value: IPsec
             -
-              uuid: 6325229ec5be4d0d90de5034f8cca59e
+              uuid: 3c930589b9124ad6add92952e5cc6ae3
               name: 'IPsec Swan Connection {#NAME} Tunnel Mode ({#IKEID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},aggressive]'
@@ -81,7 +81,7 @@ zabbix_export:
                   tag: Application
                   value: IPsec
             -
-              uuid: 1c7c0bf5479e45a8b513a82aaee6ea3b
+              uuid: 531c6c41e4b9481db57f1d8e3291328a
               name: 'IPsec Swan Connection {#NAME} Remote Gateway(s) ({#IKEID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},remote_addrs]'
@@ -94,7 +94,7 @@ zabbix_export:
                   tag: Application
                   value: IPsec
             -
-              uuid: 1c7c0bf5479e45a8b513a82aaee6ea3b
+              uuid: dfad934fd1f74aac8af2bd0be42fa0f5
               name: 'IPsec Swan Connection {#NAME} Local Gateway(s) ({#IKEID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},local_addrs]'
@@ -107,7 +107,7 @@ zabbix_export:
                   tag: Application
                   value: IPsec
             -
-              uuid: 0f06128058714627865976c6e52fa3f3
+              uuid: 1e0de765775f480a8815c925c7e42580
               name: 'IPsec Swan Connection {#NAME} Status ({#IKEID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},status]'
@@ -120,13 +120,13 @@ zabbix_export:
                   value: IPsec
           trigger_prototypes:
             -
-              uuid: d3427e0d7e30413484bf77e09b17fe53
-              expression: 'last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},enabled])=1 and last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},status])<>"ESTABLISHED" and last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},children])<>"INSTALLED"'
+              uuid: acad4a6ea6c9425fa5d53aa3f446d98f
+              expression: 'last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},enabled])=1 and last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},status])<>"ESTABLISHED" '
               name: 'IPsec Swan Connection ({#NAME}) Not Connected ({#IKEID})'
               priority: HIGH
               description: 'IPsec Swan Connection is not connected.'
         -
-          uuid: 414e60a982cd49f3bb2a35eda800293b
+          uuid: 385d3a385c4444709a50d9a10ab3aa83
           name: 'IPsec Swan Children Discovery'
           type: ZABBIX_ACTIVE
           key: 'opnsense.discovery[ipsec_swan_children]'
@@ -134,7 +134,7 @@ zabbix_export:
           description: 'Discovery of IPsec Swan Children'
           item_prototypes:
             -
-              uuid: 83a2181db5464d5698a966eafab8a33e
+              uuid: d88f54d6d6c8467ba731adb751c0dbb4
               name: 'IPsec Swan Child {#NAME} Enabled ({#IKEID}.{#REQID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},enabled,children]'
@@ -147,10 +147,10 @@ zabbix_export:
                   tag: Application
                   value: IPsec
             -
-              uuid: 28099d05480247e29d23afe77a5a9a8b
+              uuid: e82336d56a1b462980a7d56d88e51329
               name: 'IPsec Swan Child {#NAME} Mode ({#IKEID}.{#REQID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#UNIQID},mode,children]'
+              key: 'opnsense.value[ipsec_swan,{#IKEID},mode,children]'
               delay: 600s
               value_type: TEXT
               description: 'IPsec Swan Child Mode'
@@ -159,10 +159,10 @@ zabbix_export:
                   tag: Application
                   value: IPsec                                
             -
-              uuid: 245eed965cb4486187282fbe41acb330
+              uuid: 4572dbd1e67d40b6a0a17e15fe96a8c3
               name: 'IPsec Swan Child {#NAME} Re-key Time ({#IKEID}.{#REQID})'
               type: ZABBIX_ACTIVE
-              key: 'opnsense.value[ipsec_swan,{#UNIQID},rekey_time,children]'
+              key: 'opnsense.value[ipsec_swan,{#IKEID},rekey_time,children]'
               delay: 600s
               units: s
               description: 'IPsec Swan Child  Re-key Time'
@@ -171,7 +171,7 @@ zabbix_export:
                   tag: Application
                   value: IPsec
             -
-              uuid: 0f061280587146X7865976c6e52fa3f3
+              uuid: e8420d827a8b477b9f47152a0921c261
               name: 'IPsec Swan Child {#NAME} Status ({#IKEID}.{#REQID})'
               type: ZABBIX_ACTIVE
               key: 'opnsense.value[ipsec_swan,{#IKEID},status,children]'
@@ -182,9 +182,16 @@ zabbix_export:
                 -
                   tag: Application
                   value: IPsec
+          trigger_prototypes:
+            -
+              uuid: 3149095c806b49b8885307f063742e80
+              expression: 'last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},enabled,children])=1 and last(/Template opnSense Active IPsec Swan/opnsense.value[ipsec_swan,{#IKEID},status,children])<>"INSTALLED"'
+              name: 'IPsec Swan Connection ({#NAME}) Not Connected ({#IKEID})'
+              priority: HIGH
+              description: 'IPsec Swan Connection is not connected.'                  
       valuemaps:
         -
-          uuid: a15f750487f5429c92ff5e1d6a81ae1f
+          uuid: bfab6ac9afd94b179ea0af4556104f0e
           name: 'opnSense IPsec Enabled'
           mappings:
             -
@@ -194,7 +201,7 @@ zabbix_export:
               value: '0'
               newvalue: 'No'
         -
-          uuid: a15f750487f5429cn2ff5e1d6a81ae1f
+          uuid: 81b4b444bcba4313812d71cb58f5d36d
           name: 'opnSense IPsec MOBIKE'
           mappings:
             -
@@ -204,7 +211,7 @@ zabbix_export:
               value: '0'
               newvalue: 'No'
         -
-          uuid: 3f481d2513894d6bb3f624a2d8a951ec
+          uuid: 75fcaf0dc59946259a2bdcf1fa4ad6d5
           name: 'opnSense IPsec Tunnel Mode'
           mappings:
             -
