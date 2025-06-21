@@ -1,7 +1,7 @@
 # CHANGELOG
 
 * 2025-06-20:
-	* Merged 
+	* Merged silureth's IPSec support branch.
 * 2024-04-29:
 	* Fixed Individual Gateway Status support.
 	* Fixed OpenVPN Server Data Fetching to support both *Legacy* and *MVC* Instances.
