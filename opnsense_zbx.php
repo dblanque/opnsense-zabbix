@@ -124,6 +124,16 @@ function opnf_get_carp_status()
 	return execute_script($prog, $script, $json_decode);
 }
 
+function get_carp_status_by_vhid($if_vhid)
+{
+	foreach (legacy_interfaces_details() as $intf) {
+		if (!empty($intf['carp']) && $intf['vhid'] == $if_vhid) {
+			return $intf['carp']['status'];
+		}
+	}
+	return null;
+}
+
 //Testing function, for template creating purpose
 function opnf_test()
 {
@@ -1060,11 +1070,17 @@ function opnf_carp_status($echo = true)
 
 		$status_changed = false;
 		$prev_status = "";
-		foreach ($config['virtualip']['vip'] as $carp) {
+		$vips = $config['virtualip']['vip'];
+		if (array_key_exists("interface", $vips)) {
+			$vips = array($vips);
+		}
+		foreach ($vips as $carp) {
 			if ($carp['mode'] != "carp") {
 				continue;
 			}
-			$if_status = get_carp_interface_status("_vip{$carp['uniqid']}");
+			$if_vhid =$carp['vhid"'];
+			//$if_status = get_carp_interface_status("_vip{$carp['uniqid']}"); //TODO, would be better to find it through uniqid
+			$if_status = get_carp_status_by_vhid($if_vhid);			
 
 			if (($prev_status != $if_status) && (empty($if_status) == false)) { //Some glitches with GUI
 				if ($prev_status != "") $status_changed = true;
