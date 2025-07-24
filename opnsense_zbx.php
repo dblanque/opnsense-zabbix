@@ -12,6 +12,7 @@ Contributors:
 	- dblanque
 	- julioliraup
 	- silureth
+	- habilleandro
  */
 
 // Some Useful defines
@@ -1340,9 +1341,17 @@ function opnf_get_packages_upgrade()
 function opnf_packages_uptodate()
 {
 	$pkg_upgrade = opnf_get_packages_upgrade();
-	if ($pkg_upgrade->download_size > 0)
-		return false;
-	return true;
+
+	// If there are upgrade_sets with different versions, there is upgrade
+	if (!empty($pkg_upgrade->upgrade_sets)) {
+		foreach ($pkg_upgrade->upgrade_sets as $set) {
+			if ($set->current_version !== $set->new_version) {
+				return false; // Update available
+			}
+		}
+	}
+
+	return true; // No updates detected
 }
 
 // ! Not working or tested on OPNSense yet.
@@ -1382,9 +1391,20 @@ function opnf_get_version()
 
 function opnf_get_new_version($sysVersion, $currentVersion)
 {
-	$filename = "/tmp/pkg_upgrade.json";
-	foreach ($sysVersion["upgrade_packages"] as $pkg_k => $pkg_v)
-		if ($pkg_v["name"] == "opnsense") return $pkg_v["new_version"];
+	// Try searching for upgrade_packages
+	foreach ($sysVersion["upgrade_packages"] as $pkg_v) {
+		if ($pkg_v["name"] == "opnsense") {
+			return $pkg_v["new_version"];
+		}
+	}
+
+	// If empty, try upgrade_sets
+	foreach ($sysVersion["upgrade_sets"] as $set) {
+		if ($set["name"] == "packages") {
+			return $set["new_version"];
+		}
+	}
+
 	return $currentVersion;
 }
 
@@ -1398,26 +1418,47 @@ function opnf_get_system_value($section)
 	} else {
 		if ($section == "new_version_available") {
 			echo "0";
+			return;
 		}
 	}
+
 	switch ($section) {
 		case "version":
-			echo (opnf_get_new_version($sysVersion, opnf_get_version()));
+			echo opnf_get_new_version($sysVersion, opnf_get_version());
 			break;
 		case "installed_version":
-			echo (opnf_get_version());
+			echo opnf_get_version();
 			break;
 		case "new_version_available":
 			$new_version_available = false;
-			foreach ($sysVersion["upgrade_packages"] as $pkg_k => $pkg_v)
-				if ($pkg_v["name"] == "opnsense") $new_version_available = true;
-			if ($new_version_available == true)
+
+			// Checks for new version "opnsense" packages
+			foreach ($sysVersion["upgrade_packages"] as $pkg_v) {
+				if ($pkg_v["name"] == "opnsense") {
+					$new_version_available = true;
+					break;
+				}
+			}
+
+			// If upgrade_packages is empty, check upgrade_sets
+			if (!$new_version_available && isset($sysVersion["upgrade_sets"])) {
+				foreach ($sysVersion["upgrade_sets"] as $set) {
+					if ($set["name"] == "packages" && $set["current_version"] !== $set["new_version"]) {
+						$new_version_available = true;
+						break;
+					}
+				}
+			}
+
+			if ($new_version_available) {
 				echo "1";
-			else
+			} else {
 				echo "0";
+			}
 			break;
+
 		case "packages_update":
-			echo $sysVersion["upgrade_packages"];
+			echo json_encode($sysVersion["upgrade_packages"]);
 			break;
 	}
 }
@@ -1455,6 +1496,7 @@ function opnf_get_smart_status()
 
 	echo $status;
 }
+
 
 // Certificats validity date
 function opnf_get_cert_date($valuekey)
