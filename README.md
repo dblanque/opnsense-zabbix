@@ -11,10 +11,7 @@ Original Zabbix pfSense Template by **R. Bicelli**
 *Tested on Zabbix 6.0-7.0 LTS*
 
 ### Contributors
-* **Riccardo Bicelli** ([rbicelli](https://github.com/rbicelli), project forked from pfSense Template Repository)
-* **Dylan Blanqué** ([dblanque](https://github.com/dblanque), repository maintainer)
-* **Julio Liraup** ([julioliraup](https://github.com/julioliraup))
-* **Herczeg Szilárd** ([silureth](https://github.com/silureth), Added IPSec/Swan Support)
+[See the CONTRIBUTORS.md file](./CONTRIBUTORS.md).
 
 ### Would you like to support me?
 <a href='https://ko-fi.com/E1E2YQ4TG' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
