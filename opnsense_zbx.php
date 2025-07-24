@@ -12,6 +12,7 @@ Contributors:
 	- dblanque
 	- julioliraup
 	- silureth
+	- habilleandro
  */
 
 // Some Useful defines
@@ -1341,16 +1342,16 @@ function opnf_packages_uptodate()
 {
 	$pkg_upgrade = opnf_get_packages_upgrade();
 
-	// Se houver upgrade_sets com versões diferentes, há atualização
+	// If there are upgrade_sets with different versions, there is upgrade
 	if (!empty($pkg_upgrade->upgrade_sets)) {
 		foreach ($pkg_upgrade->upgrade_sets as $set) {
 			if ($set->current_version !== $set->new_version) {
-				return false; // Atualização disponível
+				return false; // Update available
 			}
 		}
 	}
 
-	return true; // Nenhuma atualização detectada
+	return true; // No updates detected
 }
 
 // ! Not working or tested on OPNSense yet.
@@ -1390,14 +1391,14 @@ function opnf_get_version()
 
 function opnf_get_new_version($sysVersion, $currentVersion)
 {
-	// Tenta buscar por upgrade_packages (antigo)
+	// Try searching for upgrade_packages
 	foreach ($sysVersion["upgrade_packages"] as $pkg_v) {
 		if ($pkg_v["name"] == "opnsense") {
 			return $pkg_v["new_version"];
 		}
 	}
 
-	// Se estiver vazio, tenta por upgrade_sets (novo)
+	// If empty, try upgrade_sets
 	foreach ($sysVersion["upgrade_sets"] as $set) {
 		if ($set["name"] == "packages") {
 			return $set["new_version"];
@@ -1431,7 +1432,7 @@ function opnf_get_system_value($section)
 		case "new_version_available":
 			$new_version_available = false;
 
-			// Verifica se há pacotes "opnsense" com nova versão
+			// Checks for new version "opnsense" packages
 			foreach ($sysVersion["upgrade_packages"] as $pkg_v) {
 				if ($pkg_v["name"] == "opnsense") {
 					$new_version_available = true;
@@ -1439,7 +1440,7 @@ function opnf_get_system_value($section)
 				}
 			}
 
-			// Se upgrade_packages estiver vazio, verifica upgrade_sets
+			// If upgrade_packages is empty, check upgrade_sets
 			if (!$new_version_available && isset($sysVersion["upgrade_sets"])) {
 				foreach ($sysVersion["upgrade_sets"] as $set) {
 					if ($set["name"] == "packages" && $set["current_version"] !== $set["new_version"]) {
