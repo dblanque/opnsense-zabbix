@@ -1342,6 +1342,15 @@ function opnf_packages_uptodate()
 {
 	$pkg_upgrade = opnf_get_packages_upgrade();
 
+	// If there are upgrade_packages with different versions (pre-25.7)
+	if (!empty($pkg_upgrade->upgrade_packages)) {
+		foreach ($pkg_upgrade->upgrade_packages as $pkg) {
+			if ($pkg->current_version !== $pkg->new_version) {
+				return false; // Update available
+			}
+		}
+	}
+
 	// If there are upgrade_sets with different versions, there is upgrade
 	if (!empty($pkg_upgrade->upgrade_sets)) {
 		foreach ($pkg_upgrade->upgrade_sets as $set) {
