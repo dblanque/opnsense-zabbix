@@ -80,6 +80,24 @@ Please add the following cronjob to your `/etc/cron.d/opnsense_sysversion`
 
 Then restart cron with `/etc/rc.d/cron restart`
 
+### Disable Syslog Logging for Zabbix Script (OPTIONAL)
+If you've noticed that Zabbix is spamming your system logs with all it's sudo
+calls, and wish to disable it, you may write the following content onto the file
+`/usr/local/etc/sudoers.d/opnsense_zabbix_agent_nolog`
+
+```sudo
+Cmnd_Alias ZBX_SCRIPT = /usr/local/bin/php /root/scripts/opnsense_zbx.php *
+
+# Disable Sudo Logging
+Defaults!ZBX_SCRIPT !syslog
+```
+
+Then make sure it is parsed properly and has the correct permissions:
+```bash
+chmod 0440 /usr/local/etc/sudoers.d/opnsense_zabbix_agent_nolog
+visudo -c
+```
+
 ### Et Voilá
 
 Happy monitoring!
