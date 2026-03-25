@@ -125,11 +125,37 @@ function opnf_get_carp_status()
 	return execute_script($prog, $script, $json_decode);
 }
 
+/**
+ * collect carp status per vhid
+ */
+function get_vhid_status()
+{
+    $vhids = [];
+    foreach ((new OPNsense\Interfaces\Vip())->vip->iterateItems() as $id => $item) {
+        if ($item->mode == 'carp') {
+            $vhids[$id] = ['status' => 'DISABLED', 'vhid' => (string)$item->vhid];
+        }
+    }
+    foreach (legacy_interfaces_details() as $ifdata) {
+        if (!empty($ifdata['carp'])) {
+            foreach ($ifdata['carp'] as $data) {
+                foreach ($vhids as $id => &$item) {
+                    if ($item['vhid'] == $data['vhid']) {
+                        $item['status'] = $data['status'];
+                    }
+                }
+            }
+        }
+    }
+    return $vhids;
+}
+
 function get_carp_status_by_vhid($if_vhid)
 {
-	foreach (legacy_interfaces_details() as $intf) {
-		if (!empty($intf['carp']) && $intf['vhid'] == $if_vhid) {
-			return $intf['carp']['status'];
+	$vhids = get_vhid_status();
+	foreach ($vhids as $id => $intf) {
+		if (!empty($intf['status']) && $id == $if_vhid) {
+			return $intf['status'];
 		}
 	}
 	return null;
