@@ -128,7 +128,7 @@ function opnf_get_carp_status()
 /**
  * collect carp status per vhid
  */
-function get_vhid_status()
+function opnf_get_carp_vhid_data()
 {
     $vhids = [];
     foreach ((new OPNsense\Interfaces\Vip())->vip->iterateItems() as $id => $item) {
@@ -150,9 +150,9 @@ function get_vhid_status()
     return $vhids;
 }
 
-function get_carp_status_by_vhid($if_vhid)
+function opnf_get_carp_status_by_vhid($if_vhid)
 {
-	$vhids = get_vhid_status();
+	$vhids = opnf_get_carp_vhid_data();
 	foreach ($vhids as $id => $intf) {
 		if (!empty($intf['status']) && $id == $if_vhid) {
 			return $intf['status'];
@@ -1079,51 +1079,43 @@ function opnf_carp_status($echo = true)
 	$config = get_mvc_config();
 	$ret = 0;
 	$status = opnf_get_carp_status();
-	$carp_detected_problems = get_single_sysctl("net.inet.carp.demotion");
+	// Legacy Check
+	// $carp_detected_problems = get_single_sysctl("net.inet.carp.demotion");
+	// New Check
+	$carp_detected_problems = !empty($status->demotion) ? intval($status->demotion) : 0;
 
 	if ($status->status_msg == "Could not locate any defined CARP interfaces.") {
 		if ($echo == true) echo $ret;
 		return $ret;
 	}
 
-	if ($status != 0) { //CARP is enabled
+	if ($carp_detected_problems != 0) {
+		//There's some Major Problems with CARP
+		$ret = 4;
+		if ($echo == true) echo $ret;
+		return $ret;
+	}
 
-		if ($carp_detected_problems != 0) {
-			//There's some Major Problems with CARP
-			$ret = 4;
-			if ($echo == true) echo $ret;
-			return $ret;
-		}
+	$status_changed = false;
+	$prev_status = "";
+	$vips = opnf_get_carp_vhid_data();
+	foreach ($vips as $if_vhid => $carp) {
+		$if_status = opnf_get_carp_status_by_vhid($if_vhid);
 
-		$status_changed = false;
-		$prev_status = "";
-		$vips = $config['virtualip']['vip'];
-		if (array_key_exists("interface", $vips)) {
-			$vips = array($vips);
+		if (($prev_status != $if_status) && (empty($if_status) == false)) {
+			if ($prev_status != "") $status_changed = true;
+			$prev_status = $if_status;
 		}
-		foreach ($vips as $carp) {
-			if ($carp['mode'] != "carp") {
-				continue;
-			}
-			$if_vhid =$carp['vhid"'];
-			//$if_status = get_carp_interface_status("_vip{$carp['uniqid']}"); //TODO, would be better to find it through uniqid
-			$if_status = get_carp_status_by_vhid($if_vhid);			
-
-			if (($prev_status != $if_status) && (empty($if_status) == false)) { //Some glitches with GUI
-				if ($prev_status != "") $status_changed = true;
-				$prev_status = $if_status;
-			}
-		}
-		if ($status_changed) {
-			//CARP Status is inconsistent across interfaces
-			$ret = 3;
-			echo 3;
-		} else {
-			if ($prev_status == "MASTER")
-				$ret = 1;
-			else
-				$ret = 2;
-		}
+	}
+	if ($status_changed) {
+		//CARP Status is inconsistent across interfaces
+		$ret = 3;
+		echo 3;
+	} else {
+		if ($prev_status == "MASTER")
+			$ret = 1;
+		else
+			$ret = 2;
 	}
 
 	if ($echo == true) echo $ret;
